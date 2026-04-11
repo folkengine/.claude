@@ -9,11 +9,12 @@ triggers:
 
 You are facilitating a **Quality Commitments** session. The core principle: **a team owns their definition of quality.** Quality standards are not handed down — they are collaboratively defined with stakeholders and continuously refined through learning.
 
-There are three modes. Ask the user which they want:
+There are four modes. Ask the user which they want:
 
 1. **Workshop** — Collaboratively define the team's quality commitments
 2. **Matrix** — Generate or update a Quality Commitments Matrix
 3. **Defect Triage** — Analyze a defect through the quality commitments lens
+4. **Templates** — Browse pre-defined quality commitments for common project types
 
 ---
 
@@ -26,6 +27,10 @@ Ask:
 - What is the system/product being built or maintained?
 - Who are the key stakeholders (product, engineering, QA, customers)?
 - Is this greenfield, legacy, or a significant feature addition?
+
+Then ask: *"Does this sound like one of these project types? Starting from a template can save time: REST API / Microservice, Web Application, Mobile Application, Data Pipeline / ETL, CLI Tool, Full-stack Application. Or say 'scratch' to build from nothing."*
+
+If a template is selected, present its quality attributes as a starting point and proceed to Step 3, skipping Step 2.
 
 ### Step 2 — Quality attribute selection
 Present these quality attribute categories and ask the team to identify which matter most for their context. For each selected attribute, ask: *What does "good enough" look like for this project?*
@@ -52,7 +57,11 @@ Summarize the agreed attributes and their owners as inputs to the Quality Commit
 
 ## Mode 2: Quality Commitments Matrix
 
-Generate a Quality Commitments Matrix as a markdown table. Populate based on context gathered from the user or from a prior Workshop session.
+Before generating a blank matrix, ask: *"Would you like to start from a project type template? Available: REST API / Microservice, Web Application, Mobile Application, Data Pipeline / ETL, CLI Tool, Full-stack Application. Or say 'blank' to start empty."*
+
+If a template is chosen, present its starter matrix and ask what to add, remove, or change.
+
+If blank, generate from context gathered from the user or from a prior Workshop session.
 
 The matrix documents how the team ensures quality across every testing type they commit to. Columns:
 
@@ -97,6 +106,155 @@ Produce a brief defect learning summary:
 - Classification (commitment failure / gap)
 - Proposed matrix update or process fix
 - Owner and target phase for the fix
+
+---
+
+## Mode 4: Templates
+
+Present the available project type templates. Each includes prioritized quality attributes and a starter Quality Commitments Matrix. These are starting points — always customize for your context.
+
+Ask the user which template they want, then output it in full.
+
+---
+
+### Template: REST API / Microservice
+
+**Prioritized quality attributes:**
+- Functional: correctness, completeness, compliance (contract adherence)
+- Reliability: availability, fault tolerance, recoverability
+- Performance: response time, throughput, scalability
+- Security: confidentiality, integrity, authenticity
+- Maintainability: testability, analyzability (observability)
+- Compatibility: interoperability (consumer contracts)
+
+**Starter matrix:**
+
+| Quality Type | Phase | In Definition of Done? | Runs on CI? | Covers Regressions? | Boundary Coverage | Perspective |
+|---|---|---|---|---|---|---|
+| Unit tests | Development | Yes | Yes | Yes | Positive, Negative, Edge | White box |
+| Integration tests | Development / PR | Yes | Yes | Yes | Positive, Negative | Grey box |
+| Contract tests (consumer-driven) | PR / Merge | Yes | Yes | Yes | Positive, Negative | Black box |
+| Linting / static analysis | Development | Yes | Yes | Partial | — | White box |
+| Schema validation | Development | Yes | Yes | Yes | Positive, Negative | White box |
+| Security scanning (SAST/DAST) | Merge / Release | Yes | Manual trigger | Partial | Negative | Black box |
+| Load / stress testing | Release | Partial | Manual trigger | No | Edge | Black box |
+| Exploratory testing | UAT | No | No | No | Edge | Black box |
+| Observability / alerting check | Release | Yes | No | No | — | Grey box |
+
+---
+
+### Template: Web Application (SPA / Frontend)
+
+**Prioritized quality attributes:**
+- Functional: correctness, completeness
+- Usability: accessibility (WCAG 2.1 AA), learnability, user error protection
+- Performance: response time (Core Web Vitals), resource efficiency
+- Reliability: availability, recoverability
+- Compatibility: co-existence (browser matrix), interoperability
+- Security: integrity, authenticity (CSP, XSS prevention)
+
+**Starter matrix:**
+
+| Quality Type | Phase | In Definition of Done? | Runs on CI? | Covers Regressions? | Boundary Coverage | Perspective |
+|---|---|---|---|---|---|---|
+| Unit tests (components) | Development | Yes | Yes | Yes | Positive, Negative | White box |
+| E2E tests (critical paths) | PR / Merge | Yes | Yes | Yes | Positive | Black box |
+| Accessibility audit (automated) | PR | Yes | Yes | Partial | Positive, Negative | Black box |
+| Visual regression tests | PR | Partial | Yes | Yes | Positive | Black box |
+| Linting / static analysis | Development | Yes | Yes | Partial | — | White box |
+| Cross-browser compatibility | UAT | Partial | No | Partial | Edge | Black box |
+| Core Web Vitals measurement | Release | Yes | Manual trigger | No | — | Black box |
+| Manual accessibility review | UAT | No | No | No | Edge | Black box |
+| Exploratory testing | UAT | No | No | No | Edge | Black box |
+
+---
+
+### Template: Mobile Application
+
+**Prioritized quality attributes:**
+- Functional: correctness, completeness
+- Usability: accessibility, operability, user error protection
+- Performance: response time (on constrained hardware), resource efficiency (battery, memory)
+- Reliability: availability, recoverability, fault tolerance (offline behavior)
+- Portability: adaptability (OS versions), replaceability (app store compliance)
+- Security: confidentiality (local data storage), integrity
+
+**Starter matrix:**
+
+| Quality Type | Phase | In Definition of Done? | Runs on CI? | Covers Regressions? | Boundary Coverage | Perspective |
+|---|---|---|---|---|---|---|
+| Unit tests | Development | Yes | Yes | Yes | Positive, Negative | White box |
+| Integration tests | Development / PR | Yes | Yes | Yes | Positive, Negative | Grey box |
+| UI / E2E tests (simulator) | PR / Merge | Yes | Yes | Partial | Positive | Black box |
+| Device matrix testing | UAT / Release | Partial | No | Partial | Edge | Black box |
+| Offline behavior testing | UAT | Yes | No | Partial | Edge | Grey box |
+| Accessibility audit | UAT | Partial | No | Partial | Positive, Negative | Black box |
+| Performance profiling (memory/battery) | Release | Partial | No | No | Edge | White box |
+| App store compliance review | Release | Yes | No | No | — | Black box |
+| Exploratory testing | UAT | No | No | No | Edge | Black box |
+
+---
+
+### Template: Data Pipeline / ETL
+
+**Prioritized quality attributes:**
+- Functional: correctness, completeness, compliance (data contracts)
+- Reliability: fault tolerance, recoverability, maturity (idempotency)
+- Functional: data quality (accuracy, timeliness, uniqueness)
+- Security: confidentiality, integrity (data at rest and in transit)
+- Maintainability: testability, analyzability
+- Performance: throughput, resource efficiency
+
+**Starter matrix:**
+
+| Quality Type | Phase | In Definition of Done? | Runs on CI? | Covers Regressions? | Boundary Coverage | Perspective |
+|---|---|---|---|---|---|---|
+| Unit tests (transformations) | Development | Yes | Yes | Yes | Positive, Negative, Edge | White box |
+| Integration tests (source/sink) | Development / PR | Yes | Yes | Yes | Positive, Negative | Grey box |
+| Schema / contract validation | PR / Merge | Yes | Yes | Yes | Positive, Negative | White box |
+| Data quality checks (completeness, uniqueness) | Merge / Release | Yes | Yes | Partial | Positive, Negative | Grey box |
+| Idempotency testing | PR | Yes | Yes | Yes | Positive, Edge | Grey box |
+| Reconciliation / audit testing | UAT | Yes | No | Partial | Positive, Negative | Black box |
+| Volume / performance testing | Release | Partial | Manual trigger | No | Edge | Black box |
+| Linting / static analysis | Development | Yes | Yes | Partial | — | White box |
+| Exploratory / anomaly testing | UAT | No | No | No | Edge | Black box |
+
+---
+
+### Template: CLI Tool
+
+**Prioritized quality attributes:**
+- Functional: correctness, completeness
+- Usability: operability (clear flags/commands), user error protection (helpful errors), learnability (docs/help text)
+- Portability: adaptability (OS/shell compatibility), installability
+- Reliability: fault tolerance, recoverability
+- Maintainability: testability, modifiability
+- Performance: response time (startup, execution)
+
+**Starter matrix:**
+
+| Quality Type | Phase | In Definition of Done? | Runs on CI? | Covers Regressions? | Boundary Coverage | Perspective |
+|---|---|---|---|---|---|---|
+| Unit tests | Development | Yes | Yes | Yes | Positive, Negative, Edge | White box |
+| Integration / end-to-end tests | Development / PR | Yes | Yes | Yes | Positive, Negative | Black box |
+| Linting / static analysis | Development | Yes | Yes | Partial | — | White box |
+| Cross-platform testing (Linux/macOS/Windows) | PR / Release | Partial | Yes | Partial | Edge | Black box |
+| Error message quality review | PR | Partial | No | No | Negative | Black box |
+| Help text / docs accuracy check | Release | Partial | No | No | — | Black box |
+| Performance (startup time) | Release | No | Manual trigger | No | Edge | White box |
+| Exploratory testing | UAT | No | No | No | Edge | Black box |
+
+---
+
+### Template: Full-stack Application
+
+Combine the **Web Application** and **REST API / Microservice** templates. Merge their matrices, removing duplicate rows. Add one full-stack-specific row:
+
+| Quality Type | Phase | In Definition of Done? | Runs on CI? | Covers Regressions? | Boundary Coverage | Perspective |
+|---|---|---|---|---|---|---|
+| Full-stack E2E tests (UI → API → DB) | Merge / UAT | Yes | Yes | Yes | Positive, Edge | Black box |
+
+All other rows come from the respective frontend and backend templates. Prioritize getting CI coverage on the full-stack E2E suite early — it is the most common gap on full-stack projects.
 
 ---
 
