@@ -30,3 +30,7 @@ The following plugins are active in this Claude Code environment and may be rele
 - Skill files use YAML frontmatter to declare `name`, `description`, and `trigger` conditions.
 - The `Skill` tool in Claude Code invokes skills by name; the system-reminder lists available skills each turn.
 - Skills interact with users through standard tool calls (Read, Edit, Bash, Write, etc.) — they do not have a separate API.
+
+## Rules
+
+- When a skill file is added to `skills/`, always add a corresponding link to `README.md` under a `## Skills` section. Use the skill's `name` as the link text pointing to the file, and the `description` from its frontmatter as the link description.
