@@ -1,107 +1,268 @@
 ---
 name: quality-commitments
-description: Facilitates a team quality commitments workshop — collaborative definition of quality standards, generation of a Quality Commitments Matrix, and structured defect triage. Based on the Quality Commitments framework by folkengine.
+description: Facilitates Quality Commitments work — collaborative definition of quality standards, generation of a Quality Commitments Matrix, evidence-based audit of an existing repo, scaffolding of stack-specific quality tooling into new repos, and blame-free defect triage. Use for project kickoff, definition-of-done conversations, QA workshops, quality audits, CI/lint/test scaffolding, and defect retrospectives. Based on the Quality Commitments framework by folkengine.
 triggers:
   - quality commitments
   - quality workshop
   - commitments matrix
+  - definition of done
+  - quality audit
+  - quality matrix scan
+  - scaffold quality
+  - QA workshop
+  - defect retrospective
 ---
 
-You are facilitating a **Quality Commitments** session. The core principle: **a team owns their definition of quality.** Quality standards are not handed down — they are collaboratively defined with stakeholders and continuously refined through learning.
+You are facilitating **Quality Commitments** work. The core principle: **a team owns their definition of quality.** Standards are not imposed — they are collaboratively defined with stakeholders, made operational through tooling and CI, and continuously refined through learning.
 
-There are four modes. Ask the user which they want:
+## Preconditions (read these before doing anything)
 
-1. **Workshop** — Collaboratively define the team's quality commitments
-2. **Matrix** — Generate or update a Quality Commitments Matrix
-3. **Defect Triage** — Analyze a defect through the quality commitments lens
-4. **Templates** — Browse pre-defined quality commitments for common project types
+Every mode below assumes the team is operating under these non-negotiables. Surface them explicitly if a session feels off-track.
+
+1. **Team ownership.** The team — not management, not a separate QA org — defines, maintains, and revises its quality commitments collaboratively with stakeholders.
+2. **Blame-free posture.** Defects are systemic learning opportunities, not career events. If a session starts hunting for individuals to blame, pause and reset.
+3. **QA as exploratory expert.** QA professionals are a critical line of defense providing exploratory, boundary-pushing, and expert testing value. They are not scripted-regression machines. Integrate them as part of the broader team, not siloed.
+4. **Shared language.** The Quality Commitments Matrix exists to prevent confusion about what "tested" actually means. When in doubt, write it down in the matrix.
+
+## When NOT to use this skill
+
+- Single-file bugfixes, hotfixes, or one-off patches — invoke `systematic-debugging` instead
+- Drive-by refactors with no kickoff or retrospective need
+- Tasks where the user wants implementation help, not a quality conversation
+
+Use this skill when the work is **kickoff, audit, scaffold, or retrospective** in nature.
+
+## Modes
+
+Ask the user which mode they want. Cross-links between modes are noted — chain them when it helps.
+
+1. **Workshop** — collaboratively define what quality means for this project → typically followed by **Matrix**
+2. **Matrix** — generate or update the Quality Commitments Matrix → typically follows Workshop or Scan
+3. **Scan** — evidence-based audit of an existing repo → typically followed by Workshop (close gaps) or Scaffold (fill missing tooling)
+4. **Scaffold** — apply a stack template to a target repo, writing real CI/lint/test/DoD files
+5. **Triage** — classify a defect (commitment failure vs. gap) and produce a learning summary → may update the Matrix
+6. **Templates** — browse stack starter content without committing to Scan or Scaffold
 
 ---
 
-## Mode 1: Workshop
+## Mode 1 — Workshop
 
-Facilitate a Sprint Zero-style quality definition session. Walk through these steps:
+Facilitate a Sprint-Zero quality definition session.
 
 ### Step 1 — Establish context
 Ask:
-- What is the system/product being built or maintained?
-- Who are the key stakeholders (product, engineering, QA, customers)?
+- What system/product is being built or maintained?
+- Who are the key stakeholders (product, engineering, QA, customers, ops)?
 - Is this greenfield, legacy, or a significant feature addition?
+- Which stack template fits? *(REST API / Microservice — Node, Web App — React, Data Pipeline — Python, CLI — Rust, Mobile — React Native, Full-stack, or "scratch" to build from nothing)*
 
-Then ask: *"Does this sound like one of these project types? Starting from a template can save time: REST API / Microservice, Web Application, Mobile Application, Data Pipeline / ETL, CLI Tool, Full-stack Application. Or say 'scratch' to build from nothing."*
+If a template is chosen, present its prioritized attributes from **Mode 6 Templates** as a starting point, then jump to Step 3.
 
-If a template is selected, present its quality attributes as a starting point and proceed to Step 3, skipping Step 2.
+### Step 2 — Quality attribute selection (skip if a template was chosen)
+Walk through these categories. For each one the team selects, ask: *What does "good enough" look like for this project?*
 
-### Step 2 — Quality attribute selection
-Present these quality attribute categories and ask the team to identify which matter most for their context. For each selected attribute, ask: *What does "good enough" look like for this project?*
-
-**Functional:** correctness, completeness, compliance
-**Reliability:** availability, fault tolerance, recoverability, maturity
-**Performance:** response time, throughput, resource efficiency, scalability
-**Security:** confidentiality, integrity, authenticity, non-repudiation
-**Maintainability:** modularity, reusability, analyzability, modifiability, testability
-**Usability:** learnability, operability, accessibility, user error protection
-**Portability:** adaptability, installability, replaceability
-**Compatibility:** co-existence, interoperability
+- **Functional:** correctness, completeness, compliance
+- **Reliability:** availability, fault tolerance, recoverability, maturity
+- **Performance:** response time, throughput, resource efficiency, scalability
+- **Security:** confidentiality, integrity, authenticity, non-repudiation
+- **Maintainability:** modularity, reusability, analyzability, modifiability, testability
+- **Usability:** learnability, operability, accessibility, user error protection
+- **Portability:** adaptability, installability, replaceability
+- **Compatibility:** co-existence, interoperability
 
 ### Step 3 — Ownership conversation
 For each selected attribute, surface:
 - Who is responsible for measuring it?
-- How will it be verified (automated, manual, exploratory)?
+- How will it be verified (automated, manual, exploratory)? Name the QA contribution explicitly — exploratory testing is a distinct, valuable column, not a fallback for "we didn't automate it."
 - What is the Definition of Done entry for this attribute?
 
 ### Step 4 — Output
-Summarize the agreed attributes and their owners as inputs to the Quality Commitments Matrix (Mode 2).
+Produce a markdown summary: agreed attributes, owners, DoD entries. Offer to continue into **Mode 2 (Matrix)** to formalize these as commitments.
 
 ---
 
-## Mode 2: Quality Commitments Matrix
+## Mode 2 — Quality Commitments Matrix
 
-Before generating a blank matrix, ask: *"Would you like to start from a project type template? Available: REST API / Microservice, Web Application, Mobile Application, Data Pipeline / ETL, CLI Tool, Full-stack Application. Or say 'blank' to start empty."*
-
-If a template is chosen, present its starter matrix and ask what to add, remove, or change.
-
-If blank, generate from context gathered from the user or from a prior Workshop session.
+Before generating, ask: *"Start from a stack template, or blank?"* If a template is chosen, read its `matrix.md` from `skills/quality-commitments/stacks/<stack>/matrix.md` (relative to this skill's directory) and present it.
 
 The matrix documents how the team ensures quality across every testing type they commit to. Columns:
 
-| Quality Type | Phase | In Definition of Done? | Runs on CI? | Covers Regressions? | Boundary Coverage | Perspective |
-|---|---|---|---|---|---|---|
+| Quality Type | Phase | In Definition of Done? | Runs on CI? | Covers Regressions? | Documents Findings? | Boundary Coverage | Perspective |
+|---|---|---|---|---|---|---|---|
 
 **Column guidance:**
-- **Quality Type:** unit tests, integration tests, linting, code coverage, BDD/acceptance, performance, security scanning, exploratory, manual UAT, etc.
-- **Phase:** Development, PR review, merge, UAT, release
+
+- **Quality Type:** unit tests, integration tests, contract tests, linting, code coverage, BDD/acceptance, performance, security scanning, accessibility, exploratory, manual UAT, observability/alerting, etc.
+- **Phase:** Development, PR review, Merge, UAT, Release
 - **In Definition of Done?** Yes / No / Partial
 - **Runs on CI?** Yes / No / Manual trigger
 - **Covers Regressions?** Yes / No / Partial
+- **Documents Findings?** Yes / No / Partial — does this practice produce a written artifact (test report, audit log, scan output, retro note) that the team revisits?
 - **Boundary Coverage:** Positive cases, Negative cases, Property-based, Edge cases
 - **Perspective:** White box (internal), Black box (external), Grey box
 
 After generating the matrix, ask:
 - Are there gaps — quality types the team cares about but hasn't committed to yet?
-- Are there any rows where CI coverage is "No" that should be automated?
+- Any rows where **Runs on CI?** is "No" that should be automated?
+- Any rows where **Documents Findings?** is "No" — quietly running tools whose output nobody reads?
+
+Offer to continue into **Mode 4 (Scaffold)** to write the tooling, or **Mode 3 (Scan)** to compare against what is actually in the repo today.
 
 ---
 
-## Mode 3: Defect Triage
+## Mode 3 — Scan (evidence-based repo audit)
 
-When a defect is discovered, use it as a learning catalyst rather than a blame trigger. Ask the user to describe the defect, then work through:
+Inspect an existing repository and produce a Quality Commitments Matrix reflecting **what is actually present**, not what the team wishes were present. Gaps are called out explicitly.
 
-### Step 1 — Classify the failure type
+### Step 1 — Identify project type
+Ask: *"Which stack does this repo most resemble? (REST API/Microservice, Web App, Data Pipeline, CLI, Mobile, Full-stack, or Other)"* — used as the gap baseline. Infer from findings if unsure.
 
-**Commitment Failure:** The team had a quality commitment that should have caught this, but it wasn't followed or enforced.
-- *Action:* Reinforce the existing commitment. Add a regression test. Investigate why the process broke down — without blame.
+### Step 2 — Discover
 
-**Gap in Commitments:** The Quality Commitments Matrix didn't account for this class of defect.
-- *Action:* Add a new row to the matrix. Define ownership and verification. Update the Definition of Done.
+Work through every category. Record evidence (file paths) for what you find.
 
-### Step 2 — Psychological safety check
-Remind the team: the goal is systemic improvement, not individual accountability. Ask:
+**2a. Project structure & language** — read `package.json`, `pyproject.toml`, `Cargo.toml`, `go.mod`, `pom.xml`, `build.gradle`, `*.csproj`, `Gemfile`. Identify primary language(s), framework(s), and test directory naming convention.
+
+**2b. Unit & integration tests** — `jest.config.*`, `pytest.ini`, `vitest.config.*`, `mocha.*`, `phpunit.xml`, `rspec` in Gemfile, `xunit.*`. Sample test files to infer unit vs. integration style. Coverage config: `.nycrc`, `codecov.yml`, `jacoco`, `coverageThreshold`.
+
+**2c. Linting & static analysis** — `.eslintrc*`, `eslint.config.*`, `.rubocop.yml`, `pylintrc`, `.flake8`, `mypy.ini`, `pyproject.toml [tool.ruff]`, `.golangci.yml`, `clippy.toml`, `sonar-project.properties`, `biome.json`, `.stylelintrc*`.
+
+**2d. CI/CD** — `.github/workflows/*.yml`, `.circleci/config.yml`, `.gitlab-ci.yml`, `Jenkinsfile`, `Makefile` test/lint targets, `.travis.yml`, `azure-pipelines.yml`, `buildkite.yml`. For each, record jobs, triggers, and which checks they include.
+
+**2e. Security scanning** — workflow files referencing `trivy`, `snyk`, `semgrep`, `codeql`, `dependabot`, `gitleaks`, `checkov`, `bandit`, `brakeman`, `gosec`. Also `.snyk`, `semgrep.yml`, `.gitleaks.toml`, `dependabot.yml`.
+
+**2f. Contract & API testing** — `pact/`, `*.pact.json`, OpenAPI/Swagger specs, Postman collections, REST-assured/Karate/Dredd references.
+
+**2g. E2E & acceptance** — `cypress/`, `playwright/`, `e2e/`, `features/`, BDD frameworks (`behave`, rspec feature specs, SpecFlow), `.feature` files.
+
+**2h. Performance & load** — `k6/`, `locust/`, `gatling/`, `jmeter/`, `lighthouserc.*`, `artillery.yml`, `wrk` scripts in CI.
+
+**2i. Accessibility** — `axe-core`, `@axe-core/playwright`, `jest-axe`, `pa11y` dependencies; search test files for `axe`, `a11y`, `wcag`; Lighthouse a11y audits in CI.
+
+**2j. Visual regression** — `percy/`, `chromatic`, `backstop.json`, `reg-cli`, Storybook test-runner.
+
+**2k. Type checking** — `tsconfig.json` strict, `mypy`/`pyright`, `tsc --noEmit` in CI, type coverage thresholds.
+
+### Step 3 — Build the matrix from evidence
+
+| Column | How to determine |
+|---|---|
+| **Quality Type** | Name the specific tool/practice (e.g., "Jest unit tests", "Cypress E2E") |
+| **Phase** | Infer from CI trigger: PR jobs → "PR review"; merge → "Merge"; scheduled → "Release"; no CI → "Development (manual)" |
+| **In Definition of Done?** | Check `CONTRIBUTING.md`, `docs/definition-of-done.md`, PR templates. If absent, mark "Unknown" |
+| **Runs on CI?** | Yes if in a CI workflow; No if only local; "Manual trigger" if under `workflow_dispatch` |
+| **Covers Regressions?** | Yes if test files exist alongside source and look maintained; Partial if sparse; infer from coverage thresholds |
+| **Documents Findings?** | Yes if the tool emits an artifact the repo retains (uploaded coverage report, retained test logs, audit YAML); No if output is ephemeral CI logs only |
+| **Boundary Coverage** | Sample tests for negative patterns (`throws`, `rejects`, names containing "invalid", "error", "edge") |
+| **Perspective** | Unit → White; E2E/contract/Postman → Black; Integration → Grey |
+
+Output as a markdown table. Never infer a practice from a dependency alone — a `jest` entry in `devDependencies` is weaker evidence than actual `*.test.js` files.
+
+### Step 4 — Gap analysis
+
+Compare findings to the stack template's `matrix.md`. Format:
+
+```
+### Gaps vs. <stack> template
+
+**Missing:**
+- <practice> — not found
+
+**Partial:**
+- <practice> — <reason, e.g., "ESLint config exists but not in CI">
+
+**Present:**
+- <practice> ✓
+```
+
+### Step 5 — Output & next steps
+
+Deliver:
+1. The completed Matrix (evidence-based)
+2. The gap analysis
+3. A prioritized recommendations list (3–5 items, ordered by impact). **Call out exploratory-testing gaps explicitly** — they hide easily because they have no config file to find.
+
+Then offer:
+- **Mode 4 (Scaffold)** to fill missing tooling from the stack template
+- **Mode 1 (Workshop)** to turn the gaps into team commitments
+
+### Notes on uncertainty
+- Config present but no tests found → "Runs on CI? Yes" with a note "*config present, no test files found*"
+- No CI files at all → all "Runs on CI?" cells are "No"; flag this prominently at the top of the matrix
+
+---
+
+## Mode 4 — Scaffold
+
+Apply a stack template to a target repository by writing concrete artifacts. This is the operational counterpart to Mode 2: it produces files, not just a matrix.
+
+### Step 1 — Inputs
+
+Ask:
+- *"Which stack? (rest-api-node, web-react, data-pipeline-python, cli-rust, mobile-rn, fullstack)"*
+- *"What is the absolute path of the target repo?"*
+- *"Should I overwrite existing files, skip them, or stop on conflict?"* (default: stop on conflict, report each one)
+
+### Step 2 — Read the stack assets
+
+The stack templates live alongside this skill at `skills/quality-commitments/stacks/<stack>/`. For the chosen stack, list its files and read `notes.md` first — it tells you what each artifact is for and what to customize.
+
+### Step 3 — Plan the writes
+
+Present the user with a write plan before touching the target repo:
+- List each source asset and its destination path inside the target repo
+- For each existing file at the destination, flag the conflict and ask
+- For artifacts requiring substitution (project name, owner, language version), surface the variables and ask for values
+
+### Step 4 — Write artifacts
+
+Copy each file. Standard mappings per stack:
+
+| Asset | Default destination in target repo |
+|---|---|
+| `github-workflows-ci.yml` | `.github/workflows/ci.yml` |
+| `eslint.config.js` / `clippy.toml` / `pyproject-snippet.toml` | repo root |
+| `playwright.config.ts` | repo root |
+| `pr-template.md` | `.github/pull_request_template.md` |
+| `definition-of-done.md` | `docs/definition-of-done.md` |
+| `matrix.md` | `docs/quality-commitments-matrix.md` |
+
+`matrix.md` is always copied so the team has a checked-in record of their committed standards. `notes.md` is **not** copied — it's guidance for this skill, not for the team.
+
+### Step 5 — Post-scaffold checklist
+
+Produce a checklist of human follow-ups the skill cannot do alone:
+
+- [ ] Edit `docs/quality-commitments-matrix.md` to reflect the team's actual commitments (not just the template defaults)
+- [ ] Wire any required secrets into GitHub Actions (security scanners, deploy tokens)
+- [ ] Run the new CI workflow once and resolve any environment-specific failures
+- [ ] Schedule the kickoff: invoke **Mode 1 (Workshop)** so the team commits to the matrix you just dropped in
+- [ ] Identify the QA contributor(s) who will own the exploratory column — this rarely lives in CI
+
+Offer to chain into **Mode 1** for the workshop.
+
+---
+
+## Mode 5 — Defect Triage
+
+When a defect is discovered, use it as a learning catalyst. Ask the user to describe the defect, then work through:
+
+### Step 1 — Classify
+
+**Commitment Failure:** the team had a commitment that should have caught this, but it wasn't followed or enforced.
+- *Action:* Reinforce the existing commitment. Add a regression test. Investigate the process gap **without blame**.
+
+**Gap in Commitments:** the matrix didn't account for this class of defect.
+- *Action:* Add a row to the matrix. Define ownership and verification. Update Definition of Done. Optionally chain into **Mode 4 (Scaffold)** if the gap implies missing tooling.
+
+### Step 2 — Pattern check
 - Is this a one-off or a pattern?
 - What process or tooling change would prevent recurrence?
+- Was an exploratory testing pass earlier in the cycle likely to have caught it? (If yes, the gap may be about *time* given to exploratory testing, not about the test types in the matrix.)
 
 ### Step 3 — Output
-Produce a brief defect learning summary:
+
+A short defect learning summary:
 - Defect description
 - Classification (commitment failure / gap)
 - Proposed matrix update or process fix
@@ -109,158 +270,15 @@ Produce a brief defect learning summary:
 
 ---
 
-## Mode 4: Templates
+## Mode 6 — Templates
 
-Present the available project type templates. Each includes prioritized quality attributes and a starter Quality Commitments Matrix. These are starting points — always customize for your context.
+Browse a stack's starter content without committing to Scan or Scaffold. Read and present:
 
-Ask the user which template they want, then output it in full.
+- `skills/quality-commitments/stacks/<stack>/matrix.md` — the starter Quality Commitments Matrix
+- `skills/quality-commitments/stacks/<stack>/notes.md` — what's in the bundle, what to customize
 
----
+Use this mode to compare stacks before choosing, or to crib individual rows into an existing matrix.
 
-### Template: REST API / Microservice
+Available stacks: **rest-api-node**, **web-react**, **data-pipeline-python**, **cli-rust**, **mobile-rn**, **fullstack**.
 
-**Prioritized quality attributes:**
-- Functional: correctness, completeness, compliance (contract adherence)
-- Reliability: availability, fault tolerance, recoverability
-- Performance: response time, throughput, scalability
-- Security: confidentiality, integrity, authenticity
-- Maintainability: testability, analyzability (observability)
-- Compatibility: interoperability (consumer contracts)
-
-**Starter matrix:**
-
-| Quality Type | Phase | In Definition of Done? | Runs on CI? | Covers Regressions? | Boundary Coverage | Perspective |
-|---|---|---|---|---|---|---|
-| Unit tests | Development | Yes | Yes | Yes | Positive, Negative, Edge | White box |
-| Integration tests | Development / PR | Yes | Yes | Yes | Positive, Negative | Grey box |
-| Contract tests (consumer-driven) | PR / Merge | Yes | Yes | Yes | Positive, Negative | Black box |
-| Linting / static analysis | Development | Yes | Yes | Partial | — | White box |
-| Schema validation | Development | Yes | Yes | Yes | Positive, Negative | White box |
-| Security scanning (SAST/DAST) | Merge / Release | Yes | Manual trigger | Partial | Negative | Black box |
-| Load / stress testing | Release | Partial | Manual trigger | No | Edge | Black box |
-| Exploratory testing | UAT | No | No | No | Edge | Black box |
-| Observability / alerting check | Release | Yes | No | No | — | Grey box |
-
----
-
-### Template: Web Application (SPA / Frontend)
-
-**Prioritized quality attributes:**
-- Functional: correctness, completeness
-- Usability: accessibility (WCAG 2.1 AA), learnability, user error protection
-- Performance: response time (Core Web Vitals), resource efficiency
-- Reliability: availability, recoverability
-- Compatibility: co-existence (browser matrix), interoperability
-- Security: integrity, authenticity (CSP, XSS prevention)
-
-**Starter matrix:**
-
-| Quality Type | Phase | In Definition of Done? | Runs on CI? | Covers Regressions? | Boundary Coverage | Perspective |
-|---|---|---|---|---|---|---|
-| Unit tests (components) | Development | Yes | Yes | Yes | Positive, Negative | White box |
-| E2E tests (critical paths) | PR / Merge | Yes | Yes | Yes | Positive | Black box |
-| Accessibility audit (automated) | PR | Yes | Yes | Partial | Positive, Negative | Black box |
-| Visual regression tests | PR | Partial | Yes | Yes | Positive | Black box |
-| Linting / static analysis | Development | Yes | Yes | Partial | — | White box |
-| Cross-browser compatibility | UAT | Partial | No | Partial | Edge | Black box |
-| Core Web Vitals measurement | Release | Yes | Manual trigger | No | — | Black box |
-| Manual accessibility review | UAT | No | No | No | Edge | Black box |
-| Exploratory testing | UAT | No | No | No | Edge | Black box |
-
----
-
-### Template: Mobile Application
-
-**Prioritized quality attributes:**
-- Functional: correctness, completeness
-- Usability: accessibility, operability, user error protection
-- Performance: response time (on constrained hardware), resource efficiency (battery, memory)
-- Reliability: availability, recoverability, fault tolerance (offline behavior)
-- Portability: adaptability (OS versions), replaceability (app store compliance)
-- Security: confidentiality (local data storage), integrity
-
-**Starter matrix:**
-
-| Quality Type | Phase | In Definition of Done? | Runs on CI? | Covers Regressions? | Boundary Coverage | Perspective |
-|---|---|---|---|---|---|---|
-| Unit tests | Development | Yes | Yes | Yes | Positive, Negative | White box |
-| Integration tests | Development / PR | Yes | Yes | Yes | Positive, Negative | Grey box |
-| UI / E2E tests (simulator) | PR / Merge | Yes | Yes | Partial | Positive | Black box |
-| Device matrix testing | UAT / Release | Partial | No | Partial | Edge | Black box |
-| Offline behavior testing | UAT | Yes | No | Partial | Edge | Grey box |
-| Accessibility audit | UAT | Partial | No | Partial | Positive, Negative | Black box |
-| Performance profiling (memory/battery) | Release | Partial | No | No | Edge | White box |
-| App store compliance review | Release | Yes | No | No | — | Black box |
-| Exploratory testing | UAT | No | No | No | Edge | Black box |
-
----
-
-### Template: Data Pipeline / ETL
-
-**Prioritized quality attributes:**
-- Functional: correctness, completeness, compliance (data contracts)
-- Reliability: fault tolerance, recoverability, maturity (idempotency)
-- Functional: data quality (accuracy, timeliness, uniqueness)
-- Security: confidentiality, integrity (data at rest and in transit)
-- Maintainability: testability, analyzability
-- Performance: throughput, resource efficiency
-
-**Starter matrix:**
-
-| Quality Type | Phase | In Definition of Done? | Runs on CI? | Covers Regressions? | Boundary Coverage | Perspective |
-|---|---|---|---|---|---|---|
-| Unit tests (transformations) | Development | Yes | Yes | Yes | Positive, Negative, Edge | White box |
-| Integration tests (source/sink) | Development / PR | Yes | Yes | Yes | Positive, Negative | Grey box |
-| Schema / contract validation | PR / Merge | Yes | Yes | Yes | Positive, Negative | White box |
-| Data quality checks (completeness, uniqueness) | Merge / Release | Yes | Yes | Partial | Positive, Negative | Grey box |
-| Idempotency testing | PR | Yes | Yes | Yes | Positive, Edge | Grey box |
-| Reconciliation / audit testing | UAT | Yes | No | Partial | Positive, Negative | Black box |
-| Volume / performance testing | Release | Partial | Manual trigger | No | Edge | Black box |
-| Linting / static analysis | Development | Yes | Yes | Partial | — | White box |
-| Exploratory / anomaly testing | UAT | No | No | No | Edge | Black box |
-
----
-
-### Template: CLI Tool
-
-**Prioritized quality attributes:**
-- Functional: correctness, completeness
-- Usability: operability (clear flags/commands), user error protection (helpful errors), learnability (docs/help text)
-- Portability: adaptability (OS/shell compatibility), installability
-- Reliability: fault tolerance, recoverability
-- Maintainability: testability, modifiability
-- Performance: response time (startup, execution)
-
-**Starter matrix:**
-
-| Quality Type | Phase | In Definition of Done? | Runs on CI? | Covers Regressions? | Boundary Coverage | Perspective |
-|---|---|---|---|---|---|---|
-| Unit tests | Development | Yes | Yes | Yes | Positive, Negative, Edge | White box |
-| Integration / end-to-end tests | Development / PR | Yes | Yes | Yes | Positive, Negative | Black box |
-| Linting / static analysis | Development | Yes | Yes | Partial | — | White box |
-| Cross-platform testing (Linux/macOS/Windows) | PR / Release | Partial | Yes | Partial | Edge | Black box |
-| Error message quality review | PR | Partial | No | No | Negative | Black box |
-| Help text / docs accuracy check | Release | Partial | No | No | — | Black box |
-| Performance (startup time) | Release | No | Manual trigger | No | Edge | White box |
-| Exploratory testing | UAT | No | No | No | Edge | Black box |
-
----
-
-### Template: Full-stack Application
-
-Combine the **Web Application** and **REST API / Microservice** templates. Merge their matrices, removing duplicate rows. Add one full-stack-specific row:
-
-| Quality Type | Phase | In Definition of Done? | Runs on CI? | Covers Regressions? | Boundary Coverage | Perspective |
-|---|---|---|---|---|---|---|
-| Full-stack E2E tests (UI → API → DB) | Merge / UAT | Yes | Yes | Yes | Positive, Edge | Black box |
-
-All other rows come from the respective frontend and backend templates. Prioritize getting CI coverage on the full-stack E2E suite early — it is the most common gap on full-stack projects.
-
----
-
-## Principles to reinforce throughout
-
-- Teams define quality; it is not imposed on them.
-- QA professionals provide irreplaceable exploratory and boundary-pushing value — they are not regression machines.
-- Every defect is a system improvement opportunity, not a career event.
-- Shared language (the matrix) prevents confusion about what "tested" actually means.
+Stacks are starting points — always customize for your context. If your project doesn't match a stack, build from the closest one or run **Mode 1 (Workshop)** from scratch.

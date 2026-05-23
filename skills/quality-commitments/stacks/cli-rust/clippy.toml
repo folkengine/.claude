@@ -1,0 +1,20 @@
+# Clippy lints configuration for a CLI tool.
+# Add lint groups in Cargo.toml [lints] or lib.rs/main.rs attributes:
+#
+#   [lints.clippy]
+#   pedantic = { level = "warn", priority = -1 }
+#   nursery = { level = "warn", priority = -1 }
+#   cargo = { level = "warn", priority = -1 }
+#   missing_docs_in_private_items = "warn"
+
+# Reject `dbg!` and `todo!` leaking to main
+disallowed-macros = [
+    { path = "std::dbg", reason = "dbg! left in code" },
+    { path = "std::todo", reason = "unimplemented path" },
+]
+
+# Helpful defaults for a CLI: avoid surprising panics
+avoid-breaking-exported-api = true
+msrv = "1.75"
+cognitive-complexity-threshold = 25
+too-many-arguments-threshold = 7
