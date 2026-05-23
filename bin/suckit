@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+# suckit — pull in skills and commands from ~/.claude that aren't yet in this repo.
+#
+# Source: ~/.claude/skills/    -> <repo>/skills/
+#         ~/.claude/commands/  -> <repo>/commands/
+#
+# Existing entries in the destination are never overwritten. A top-level
+# existence check is used (not `cp -Rn`) so locally-diverged skills are
+# left fully untouched.
+
+set -euo pipefail
+
+# Resolve the repo root as the parent of this script's directory, so the
+# script works regardless of the caller's cwd.
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+repo_root="$(cd -- "$script_dir/.." && pwd)"
+
+src_skills="$HOME/.claude/skills"
+src_commands="$HOME/.claude/commands"
+dst_skills="$repo_root/skills"
+dst_commands="$repo_root/commands"
+
+added_skills=()
+added_commands=()
+skipped=0
+
+# Sync top-level entries from $1 (source) into $2 (destination), labeling
+# output with $3 (skill|command) and appending new names to the global
+# array named by $4. Existing destination entries are left untouched.
+sync_dir() {
+    src="$1"
+    dst="$2"
+    label="$3"
+    accum_name="$4"
+
+    if [[ ! -d "$src" ]]; then
+        printf '  (no source dir %s — skipping)\n' "$src"
+        return 0
+    fi
+
+    mkdir -p "$dst"
+
+    # nullglob: empty dir yields no iterations instead of a literal '*'.
+    # dotglob is left off so .DS_Store and friends are never copied.
+    shopt -s nullglob
+    for entry in "$src"/*; do
+        name="$(basename "$entry")"
+
+        if [[ -e "$dst/$name" ]]; then
+            skipped=$((skipped + 1))
+            continue
+        fi
+
+        cp -R "$entry" "$dst/"
+        # Append to the caller-named global array via eval — Bash 3.2 has
+        # no namerefs, so this is the portable equivalent.
+        eval "${accum_name}+=(\"\$name\")"
+        printf '  + %s: %s\n' "$label" "$name"
+    done
+    shopt -u nullglob
+}
+
+printf 'syncing skills from %s -> %s\n' "$src_skills" "$dst_skills"
+sync_dir "$src_skills" "$dst_skills" skill added_skills
+
+printf '\nsyncing commands from %s -> %s\n' "$src_commands" "$dst_commands"
+sync_dir "$src_commands" "$dst_commands" command added_commands
+
+printf '\n---\n'
+printf 'added %d skill(s), %d command(s); skipped %d existing entr%s.\n' \
+    "${#added_skills[@]}" "${#added_commands[@]}" "$skipped" \
+    "$([[ $skipped -eq 1 ]] && echo y || echo ies)"
+
+if (( ${#added_skills[@]} > 0 )); then
+    printf '\nReminder: add each new skill to README.md under "## Skills"\n'
+    printf '          using the skill name and its frontmatter description.\n'
+    printf 'New skills:\n'
+    printf '  - %s\n' "${added_skills[@]}"
+fi
