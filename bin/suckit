@@ -3,6 +3,7 @@
 #
 # Source: ~/.claude/skills/    -> <repo>/skills/
 #         ~/.claude/commands/  -> <repo>/commands/
+#         ~/.claude/hooks/     -> <repo>/hooks/
 #
 # Existing entries in the destination are never overwritten. A top-level
 # existence check is used (not `cp -Rn`) so locally-diverged skills are
@@ -17,11 +18,14 @@ repo_root="$(cd -- "$script_dir/.." && pwd)"
 
 src_skills="$HOME/.claude/skills"
 src_commands="$HOME/.claude/commands"
+src_hooks="$HOME/.claude/hooks"
 dst_skills="$repo_root/skills"
 dst_commands="$repo_root/commands"
+dst_hooks="$repo_root/hooks"
 
 added_skills=()
 added_commands=()
+added_hooks=()
 skipped=0
 
 # Sync top-level entries from $1 (source) into $2 (destination), labeling
@@ -66,9 +70,12 @@ sync_dir "$src_skills" "$dst_skills" skill added_skills
 printf '\nsyncing commands from %s -> %s\n' "$src_commands" "$dst_commands"
 sync_dir "$src_commands" "$dst_commands" command added_commands
 
+printf '\nsyncing hooks from %s -> %s\n' "$src_hooks" "$dst_hooks"
+sync_dir "$src_hooks" "$dst_hooks" hook added_hooks
+
 printf '\n---\n'
-printf 'added %d skill(s), %d command(s); skipped %d existing entr%s.\n' \
-    "${#added_skills[@]}" "${#added_commands[@]}" "$skipped" \
+printf 'added %d skill(s), %d command(s), %d hook(s); skipped %d existing entr%s.\n' \
+    "${#added_skills[@]}" "${#added_commands[@]}" "${#added_hooks[@]}" "$skipped" \
     "$([[ $skipped -eq 1 ]] && echo y || echo ies)"
 
 if (( ${#added_skills[@]} > 0 )); then
