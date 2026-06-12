@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# pukeit — push skills and commands from this repo into ~/.claude when they
+#           aren't already there.
+#
+# Source: <repo>/skills/    -> ~/.claude/skills/
+#         <repo>/commands/  -> ~/.claude/commands/
+#
+# Existing entries in the destination are never overwritten. A top-level
+# existence check is used (not `cp -Rn`) so locally-diverged skills are
+# left fully untouched.
+
+set -euo pipefail
+
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+repo_root="$(cd -- "$script_dir/.." && pwd)"
+
+src_skills="$repo_root/skills"
+src_commands="$repo_root/commands"
+dst_skills="$HOME/.claude/skills"
+dst_commands="$HOME/.claude/commands"
+
+added_skills=()
+added_commands=()
+skipped=0
+
+sync_dir() {
+    src="$1"
+    dst="$2"
+    label="$3"
+    accum_name="$4"
+
+    if [[ ! -d "$src" ]]; then
+        printf '  (no source dir %s — skipping)\n' "$src"
+        return 0
+    fi
+
+    mkdir -p "$dst"
+
+    shopt -s nullglob
+    for entry in "$src"/*; do
+        name="$(basename "$entry")"
+
+        if [[ -e "$dst/$name" ]]; then
+            skipped=$((skipped + 1))
+            continue
+        fi
+
+        cp -R "$entry" "$dst/"
+        eval "${accum_name}+=(\"\$name\")"
+        printf '  + %s: %s\n' "$label" "$name"
+    done
+    shopt -u nullglob
+}
+
+printf 'pushing skills from %s -> %s\n' "$src_skills" "$dst_skills"
+sync_dir "$src_skills" "$dst_skills" skill added_skills
+
+printf '\npushing commands from %s -> %s\n' "$src_commands" "$dst_commands"
+sync_dir "$src_commands" "$dst_commands" command added_commands
+
+printf '\n---\n'
+printf 'added %d skill(s), %d command(s); skipped %d existing entr%s.\n' \
+    "${#added_skills[@]}" "${#added_commands[@]}" "$skipped" \
+    "$([[ $skipped -eq 1 ]] && echo y || echo ies)"
