@@ -1,0 +1,51 @@
+# Kernel-purity CI. Drop in .github/workflows/ (or merge the `purity` job into an
+# existing workflow). This is the *testable definition* of a domain kernel: the
+# pure build compiles, and no banned crate is in its dependency tree.
+#
+# Adjust BANNED to match deny-bans.toml. For separate repos that each host a
+# kernel, lift this into the org's `.github` repo as a reusable workflow and call
+# it with `uses:` from each kernel.
+
+name: kernel-purity
+
+on:
+  push:
+  pull_request:
+
+env:
+  # Pipe-separated crate names that must be ABSENT from the pure dependency tree.
+  BANNED: "serde_yaml|serde_yaml_bw|tokio|reqwest|hyper|tonic|axum|rusqlite|sqlx"
+
+jobs:
+  purity:
+    name: Pure kernel builds and stays I/O-free
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+
+      # 1. The pure kernel must compile with no default features.
+      - run: cargo check --no-default-features --lib --tests
+
+      # 2. No banned (I/O / format / transport) crate may be in the pure tree.
+      - name: Assert pure dependency tree is I/O-free
+        run: |
+          if cargo tree --no-default-features --edges normal --prefix none \
+               | sort -u | grep -E "^($BANNED) " ; then
+            echo "::error::banned crate present in the pure (no-default-features) build"
+            exit 1
+          fi
+          echo "pure kernel dependency tree is clean"
+
+  lints:
+    name: Kernel lints (clippy + deny bans)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - run: cargo clippy --all-targets -- -D warnings
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check bans

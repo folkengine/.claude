@@ -1,0 +1,73 @@
+package imperialbower:trick-kernel@0.1.0;
+
+/// The trick-taking *domain kernel*: a pure, delivery-agnostic transition
+/// function over game state. The world below imports nothing, so the compiled
+/// component physically cannot touch the filesystem, network, clock, or
+/// environment — the "pure kernel" invariant is enforced by the component
+/// sandbox itself, not merely by a lint.
+interface kernel {
+    type seat = u8;
+
+    enum suit { clubs, diamonds, hearts, spades }
+    enum rank {
+        two, three, four, five, six, seven, eight,
+        nine, ten, jack, queen, king, ace,
+    }
+    record card { rank: rank, suit: suit }
+
+    /// `no-trump` = highest card of the led suit wins.
+    variant trump { suit(suit), no-trump }
+
+    record played-card { seat: seat, card: card }
+    record trick { leader: seat, plays: list<played-card> }
+
+    /// Full play-phase state. The engine is game-agnostic; games derive their
+    /// own flags (e.g. "spades broken") from `completed`.
+    record play-state {
+        seats: u32,
+        trump: trump,
+        hands: list<list<card>>,
+        current: trick,
+        completed: list<trick>,
+        tricks-won: list<u8>,
+    }
+    record trick-state { play: play-state }
+
+    /// Hidden-information projection: a seat sees its own hand and public table
+    /// state, opponents' hands only as sizes. This is the seam a mental-poker
+    /// layer realizes cryptographically (a hidden hand = masked cards).
+    record trick-view {
+        seat: seat,
+        my-hand: list<card>,
+        trump: trump,
+        current: trick,
+        completed-count: u32,
+        tricks-won: list<u8>,
+        opponent-hand-sizes: list<u32>,
+    }
+
+    enum engine-error { not-your-turn, illegal-play }
+
+    /// Per-side scores, e.g. [north-south, east-west] for partnership games.
+    type score = list<s32>;
+
+    /// Seat to act, or none when the hand is complete.
+    to-act: func(state: trick-state) -> option<seat>;
+    /// Legal cards `seat` may play (must-follow-suit core).
+    legal-actions: func(state: trick-state, seat: seat) -> list<card>;
+    /// Pure transition: play `card`, returning the next state or why it was rejected.
+    apply: func(state: trick-state, seat: seat, card: card) -> result<trick-state, engine-error>;
+    /// Per-seat projection — only what `seat` is entitled to see.
+    view-for: func(state: trick-state, seat: seat) -> trick-view;
+    /// Final per-side scores once the hand is complete.
+    outcome: func(state: trick-state) -> option<score>;
+
+    /// Pure helper: winner of a completed trick under `trump`.
+    trick-winner: func(t: trick, trump: trump) -> seat;
+}
+
+/// A kernel exports its contract and imports nothing. Any host language
+/// (JS via jco, Python via componentize-py, Go, …) can drive the same component.
+world trick-taking {
+    export kernel;
+}

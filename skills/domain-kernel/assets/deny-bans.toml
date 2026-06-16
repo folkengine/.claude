@@ -1,0 +1,36 @@
+# cargo-deny [bans] fragment for a domain kernel. Merge into the crate's
+# deny.toml (create one with `cargo deny init` if absent), then:
+#   cargo deny check bans
+#
+# These crates must not appear in the kernel's DEFAULT dependency graph. Keep
+# them as `optional = true` feature dependencies so convenience builds can pull
+# them, but a bare `cargo build` (pure kernel) stays free of them.
+#
+# Adjust the list to the ecosystem. The principle: format crates, async runtimes,
+# transport/RPC, and storage engines are adapter concerns, not kernel concerns.
+
+[bans]
+multiple-versions = "allow"   # set to your project's policy
+wildcards = "deny"
+
+deny = [
+    # Concrete serialization FORMATS (the `serde` trait itself is fine):
+    { name = "serde_yaml" },
+    { name = "serde_yaml_bw" },
+    # Async runtimes:
+    { name = "tokio" },
+    { name = "async-std" },
+    # Transport / RPC / HTTP:
+    { name = "reqwest" },
+    { name = "hyper" },
+    { name = "tonic" },
+    { name = "axum" },
+    # Storage engines:
+    { name = "rusqlite" },
+    { name = "sqlx" },
+]
+
+# If any of these are legitimately needed behind an opt-in feature, cargo-deny
+# will still flag them in a default build — which is exactly the signal you want.
+# Verify the pure graph directly too:
+#   cargo tree --no-default-features | grep -E "serde_yaml|tokio|reqwest|rusqlite"  # expect: nothing

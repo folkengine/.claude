@@ -1,0 +1,30 @@
+# Kernel purity lints. Drop at the crate (or workspace) root and run:
+#   cargo clippy --all-targets -- -D warnings
+#
+# These ban the entry points a pure domain kernel must not use. Trim entries the
+# kernel legitimately needs and add crate-specific offenders. Banning a *type*
+# also flags its methods; banning a *method* is for finer cases.
+
+disallowed-types = [
+    { path = "std::path::Path",    reason = "a kernel takes bytes/&str, not paths — let an adapter own the filesystem" },
+    { path = "std::path::PathBuf", reason = "filesystem policy belongs in an adapter, not the kernel" },
+    { path = "std::fs::File",      reason = "no filesystem I/O in a pure kernel" },
+    { path = "std::net::TcpStream", reason = "no network in a pure kernel" },
+    { path = "std::net::TcpListener", reason = "no network in a pure kernel" },
+    { path = "std::process::Command", reason = "no process spawning in a pure kernel" },
+]
+
+disallowed-methods = [
+    { path = "std::fs::read",          reason = "kernel must not read the filesystem" },
+    { path = "std::fs::write",         reason = "kernel must not write the filesystem" },
+    { path = "std::fs::read_to_string", reason = "kernel must not read the filesystem" },
+    { path = "std::fs::create_dir_all", reason = "kernel must not touch the filesystem" },
+    { path = "std::env::var",          reason = "kernel must not read the environment" },
+    { path = "std::env::vars",         reason = "kernel must not read the environment" },
+    # Time and randomness make the kernel non-deterministic; inject them instead.
+    { path = "std::time::SystemTime::now", reason = "inject time; a kernel is deterministic" },
+]
+
+# Note: ban runtime/transport crates (tokio, reqwest, tonic) via cargo-deny
+# `[bans]` (see deny-bans.toml) rather than here — that keeps them out of the
+# dependency graph entirely, which is stronger than a per-call lint.
