@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# suckit — pull in skills and commands from ~/.claude that aren't yet in this repo.
+# suckit — pull in skills and commands from ~/.claude into this repo.
 #
 # Source: ~/.claude/skills/    -> <repo>/skills/
 #         ~/.claude/commands/  -> <repo>/commands/
 #         ~/.claude/hooks/     -> <repo>/hooks/
 #
-# Existing entries in the destination are never overwritten. A top-level
-# existence check is used (not `cp -Rn`) so locally-diverged skills are
-# left fully untouched.
+# New entries are copied in. Existing entries are diffed against their
+# ~/.claude source and, when they differ, the repo copy is updated to match
+# the source. Identical entries are left untouched.
 
 set -euo pipefail
 
@@ -24,18 +24,23 @@ dst_commands="$repo_root/commands"
 dst_hooks="$repo_root/hooks"
 
 added_skills=()
+updated_skills=()
 added_commands=()
+updated_commands=()
 added_hooks=()
+updated_hooks=()
 skipped=0
 
 # Sync top-level entries from $1 (source) into $2 (destination), labeling
-# output with $3 (skill|command) and appending new names to the global
-# array named by $4. Existing destination entries are left untouched.
+# output with $3 (skill|command|hook), appending newly-added names to the
+# global array named by $4 and updated names to the array named by $5.
+# Entries that already match their source are left untouched.
 sync_dir() {
     src="$1"
     dst="$2"
     label="$3"
-    accum_name="$4"
+    added_name="$4"
+    updated_name="$5"
 
     if [[ ! -d "$src" ]]; then
         printf '  (no source dir %s — skipping)\n' "$src"
@@ -51,31 +56,45 @@ sync_dir() {
         name="$(basename "$entry")"
 
         if [[ -e "$dst/$name" ]]; then
-            skipped=$((skipped + 1))
+            # diff -rq handles both files and directory trees, ignoring
+            # nothing but reporting only whether they differ.
+            if diff -rq "$entry" "$dst/$name" >/dev/null 2>&1; then
+                skipped=$((skipped + 1))
+                continue
+            fi
+
+            # Diverged: replace the repo copy wholesale with the source so
+            # deletions inside the source are reflected too.
+            rm -rf "$dst/$name"
+            cp -R "$entry" "$dst/"
+            eval "${updated_name}+=(\"\$name\")"
+            printf '  ~ %s: %s (updated)\n' "$label" "$name"
             continue
         fi
 
         cp -R "$entry" "$dst/"
         # Append to the caller-named global array via eval — Bash 3.2 has
         # no namerefs, so this is the portable equivalent.
-        eval "${accum_name}+=(\"\$name\")"
+        eval "${added_name}+=(\"\$name\")"
         printf '  + %s: %s\n' "$label" "$name"
     done
     shopt -u nullglob
 }
 
 printf 'syncing skills from %s -> %s\n' "$src_skills" "$dst_skills"
-sync_dir "$src_skills" "$dst_skills" skill added_skills
+sync_dir "$src_skills" "$dst_skills" skill added_skills updated_skills
 
 printf '\nsyncing commands from %s -> %s\n' "$src_commands" "$dst_commands"
-sync_dir "$src_commands" "$dst_commands" command added_commands
+sync_dir "$src_commands" "$dst_commands" command added_commands updated_commands
 
 printf '\nsyncing hooks from %s -> %s\n' "$src_hooks" "$dst_hooks"
-sync_dir "$src_hooks" "$dst_hooks" hook added_hooks
+sync_dir "$src_hooks" "$dst_hooks" hook added_hooks updated_hooks
 
 printf '\n---\n'
-printf 'added %d skill(s), %d command(s), %d hook(s); skipped %d existing entr%s.\n' \
-    "${#added_skills[@]}" "${#added_commands[@]}" "${#added_hooks[@]}" "$skipped" \
+printf 'added %d skill(s), %d command(s), %d hook(s); updated %d; skipped %d unchanged entr%s.\n' \
+    "${#added_skills[@]}" "${#added_commands[@]}" "${#added_hooks[@]}" \
+    "$(( ${#updated_skills[@]} + ${#updated_commands[@]} + ${#updated_hooks[@]} ))" \
+    "$skipped" \
     "$([[ $skipped -eq 1 ]] && echo y || echo ies)"
 
 if (( ${#added_skills[@]} > 0 )); then

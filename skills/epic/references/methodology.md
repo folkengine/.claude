@@ -56,8 +56,10 @@ project is the practice of hardening a domain kernel, kata by kata.
   downstream repo hosts the implementation); EPIC-40+ are pkdealer-internal. A new
   downstream repo claims the next free ten-block by editing that section. **When a
   repo has such a policy, follow it; otherwise number locally** within the repo's
-  own docs folder (a standalone repo like `cardpack.rs` just takes its next free
-  number).
+  own docs folder (a standalone repo like `cardpack.rs` just takes its next
+  number). "Next" means one past the **sequential frontier** — the contiguous run
+  from 00 — never max+1, because the specials band (66/79/95–99/999) parks meta
+  docs at high numbers.
 - **Sub-letters** append a lowercase letter for a child/follow-on/tangent of a base
   number: `00c` (sub-doc of EPIC-00), `15a` (follow-on to 15), `19a` (tangent off
   19).

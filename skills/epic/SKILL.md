@@ -1,6 +1,6 @@
 ---
 name: epic
-description: Generate an EPIC design document — a domain-driven, phase-structured spec with Context, a Status table, Design sketches, phased Work Items, and a Verification block — in the pkcore/pkdealer house style. Use when the user types `/epic <thing>` or asks to "write an EPIC", "break this feature into stories or phases", "spec this out", "make a planning or design doc", "story breakdown", or "a progress report / evaluation of <branch>" — even if they never say the word EPIC. Project-agnostic: works in any repo, detects the existing documentation folder, and allocates the next EPIC number. Also produces the companion forms: progress/evaluation report, SIDEQUEST, DEFECT epic, TUTORIAL companion, and EXECUTION_PLAN / spec splits.
+description: Generate or update an EPIC design document — a domain-driven, phase-structured spec with Context, a Status table, Design sketches, phased Work Items, and a Verification block — in the pkcore/pkdealer house style. Use when the user types `/epic <thing>` or asks to "write an EPIC", "break this feature into stories or phases", "add a design doc to the docs folder", "story breakdown", "update/close out EPIC-NN", or "a progress report / evaluation of <branch>" — even if they never say the word EPIC. Do NOT trigger for ad-hoc planning of the current conversation's task (plan mode covers that) — only when the user wants a durable numbered document in the repo's docs folder. Project-agnostic: works in any repo, detects the existing documentation folder, and allocates the next EPIC number. Also produces the companion forms: progress/evaluation report, SIDEQUEST, DEFECT epic, TUTORIAL companion, and EXECUTION_PLAN / spec splits.
 ---
 
 # EPIC
@@ -31,12 +31,22 @@ Modes are chosen from the phrasing of the request (no strict flags):
 | "a defect writeup for X" | bug epic | `EPIC-DEFECT-X_Name.md` or `DEFECT_Name.md` |
 | "a tutorial for the math behind EPIC-NN" | teaching companion | `TUTORIAL_EPICNN_Name.md` |
 | "an execution plan / spec for one slice / a cross-repo contract" | slice or contract | `EPIC-NN_Name_EXECUTION_PLAN.md` / `EPIC-NN_..._spec.md` |
+| "update / close out / reconcile EPIC-NN", "write the corrigendum for EPIC-NN" | **update the existing doc** | edit `EPIC-NN_*.md` in place |
 
 ## What you must do when invoked
 
 Work through these in order. **Before writing prose, read
 `references/methodology.md`** (in this skill dir) to load the voice, the kata
 framing, the numbering policy, and the variant decision guide.
+
+**Updating an existing EPIC?** If `<thing>` names an EPIC that already exists
+(e.g. "update EPIC-29", "close out EPIC-30", "write the corrigendum"), skip
+steps 1–2: locate that file, then do step 3 (ground: verify what actually landed,
+at which commit) and apply the lifecycle edits in place — flip `## Status` rows
+to `**Complete**`/`**Deferred**` only where cited code proves it, check/uncheck
+Work Item boxes per the host repo's convention, and for shipped work append the
+`## Implementation corrigendum` (design-vs-actual deltas + Phase status summary).
+Never renumber or rename an existing EPIC.
 
 1. **Locate the documentation folder — do NOT assume `docs/`.** Detect where this
    repo keeps design docs: prefer wherever existing `EPIC-*.md` or other design
@@ -51,8 +61,13 @@ framing, the numbering policy, and the variant decision guide.
 2. **Allocate the number.** Scan the detected folder's existing `EPIC-*.md`. If a
    `ROADMAP.md` / `BACKLOG.md` carries an EPIC-numbering policy, obey it (the
    pkcore family uses ten-block namespacing — see methodology). Otherwise take the
-   next free local number, zero-padded to two digits. Use a sub-letter
-   (`NNa`) for a child/tangent of an existing EPIC. Confirm the final
+   next number after the **sequential frontier**, zero-padded to two digits —
+   NOT max+1: repos in this family park specials at high numbers (66, 79, 95–99,
+   999 = meta/backlog/ramblings), so find the highest number in the contiguous
+   run from 00 and go one past it (e.g. `…34, 36, 66, 999` → next is `37`).
+   Use a sub-letter (`NNa`) for a child/tangent of an existing EPIC. A
+   standalone progress doc with no parent EPIC takes a fresh frontier number
+   (it becomes the de-facto EPIC id for that work). Confirm the final
    `EPIC-NN_Name.md` (Title in `Snake_Case`) before writing.
 
 3. **Gather & ground.** Read the code, branch, or feature `<thing>` names. Every
