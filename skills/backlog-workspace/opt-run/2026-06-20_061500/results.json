@@ -1,0 +1,1390 @@
+{
+  "exit_reason": "max_iterations (5)",
+  "original_description": "Survey a repository for outstanding work and present it as a single backlog. Use whenever the user types /backlog or asks things like 'what's on the backlog', 'what's left to do', 'what should I work on next', 'list the open EPICs / TODOs / tech debt', or 'what work is outstanding here'. Gathers EPIC docs, ROADMAP items, TODO/FIXME/HACK comments in source, an unreleased CHANGELOG, and open GitHub issues into one list; refreshes a BACKLOG.md; and creates/maintains a docs/TECHNICAL_DEBT.md (seeding it with untracked code TODOs plus an automation-flagged code review on first creation). If a repo has no tracked work at all, propose concrete expansions instead of returning nothing. Make sure to use this skill even when the user doesn't say the word 'backlog' but clearly wants an inventory of what's left to build or fix.",
+  "best_description": "Survey a repository for outstanding work and present it as a single backlog. Use whenever the user types /backlog or asks things like 'what's on the backlog', 'what's left to do', 'what should I work on next', 'list the open EPICs / TODOs / tech debt', or 'what work is outstanding here'. Gathers EPIC docs, ROADMAP items, TODO/FIXME/HACK comments in source, an unreleased CHANGELOG, and open GitHub issues into one list; refreshes a BACKLOG.md; and creates/maintains a docs/TECHNICAL_DEBT.md (seeding it with untracked code TODOs plus an automation-flagged code review on first creation). If a repo has no tracked work at all, propose concrete expansions instead of returning nothing. Make sure to use this skill even when the user doesn't say the word 'backlog' but clearly wants an inventory of what's left to build or fix.",
+  "best_score": "4/8",
+  "best_train_score": "6/12",
+  "best_test_score": "4/8",
+  "final_description": "Use to inventory all unfinished work across a repository and hand back one prioritized list of what's left. Trigger on `/backlog`. Also trigger whenever someone steps back to ask about the state of remaining work rather than acting on a single item: what's left to do or build here, what's outstanding before this is \"done\", what to work on or pick up next, what to resume after time away from a project, or any request to gather scattered signals \u2014 open issues, roadmap, EPICs, TODO/FIXME/HACK comments, unreleased changelog \u2014 into one place to prioritize. Use it to start or refresh a BACKLOG.md, or to begin a tech-debt doc by pulling TODO comments out of the source. This is a whole-repo survey of remaining work; don't use it to fix, explain, review, or add one specific item. Fire on this intent even when the word \"backlog\" never appears.",
+  "iterations_run": 5,
+  "holdout": 0.4,
+  "train_size": 12,
+  "test_size": 8,
+  "history": [
+    {
+      "iteration": 1,
+      "description": "Survey a repository for outstanding work and present it as a single backlog. Use whenever the user types /backlog or asks things like 'what's on the backlog', 'what's left to do', 'what should I work on next', 'list the open EPICs / TODOs / tech debt', or 'what work is outstanding here'. Gathers EPIC docs, ROADMAP items, TODO/FIXME/HACK comments in source, an unreleased CHANGELOG, and open GitHub issues into one list; refreshes a BACKLOG.md; and creates/maintains a docs/TECHNICAL_DEBT.md (seeding it with untracked code TODOs plus an automation-flagged code review on first creation). If a repo has no tracked work at all, propose concrete expansions instead of returning nothing. Make sure to use this skill even when the user doesn't say the word 'backlog' but clearly wants an inventory of what's left to build or fix.",
+      "train_passed": 6,
+      "train_failed": 6,
+      "train_total": 12,
+      "train_results": [
+        {
+          "query": "what work is outstanding in this repo before I can call it done",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "round up the open github issues, the roadmap items and the FIXMEs into one place so i can prioritize",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "is there a tech debt doc? if not start one by pulling all the TODO comments out of the source",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "what's on the plate for this library \u2014 what's left to build",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "/backlog",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "i'm coming back to this project after a few months off, what should i pick up next?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "there's a FIXME in src/deck.rs about bounds checking, go fix it",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "add a new EPIC doc for a tournament-mode feature",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "explain how the bot self-play simulation works in this codebase",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "review this PR for bugs before I merge it",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "audit the downstream repos for breakage after this release",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "clean up the joke TODO comments in cards.rs, they're not real tasks",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        }
+      ],
+      "test_passed": 4,
+      "test_failed": 4,
+      "test_total": 8,
+      "test_results": [
+        {
+          "query": "give me an inventory of unfinished work across the whole codebase",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "make me a single list of everything that still needs doing here: features, half-finished stuff, tech debt, whatever you can find",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "can you go through the docs and code and give me a rundown of all the outstanding work \u2014 open EPICs, TODO comments lying around, that kind of thing",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "i want one view that shows the epic docs, the todo markers, and what's still open on github",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "how many open issues are on github right now?",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "what does EPIC-31 actually propose? summarize the PLO design doc for me",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "write release notes for the 0.1.5 release",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "implement the next item \u2014 go build pot-limit omaha",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        }
+      ],
+      "passed": 6,
+      "failed": 6,
+      "total": 12,
+      "results": [
+        {
+          "query": "what work is outstanding in this repo before I can call it done",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "round up the open github issues, the roadmap items and the FIXMEs into one place so i can prioritize",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "is there a tech debt doc? if not start one by pulling all the TODO comments out of the source",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "what's on the plate for this library \u2014 what's left to build",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "/backlog",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "i'm coming back to this project after a few months off, what should i pick up next?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "there's a FIXME in src/deck.rs about bounds checking, go fix it",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "add a new EPIC doc for a tournament-mode feature",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "explain how the bot self-play simulation works in this codebase",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "review this PR for bugs before I merge it",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "audit the downstream repos for breakage after this release",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "clean up the joke TODO comments in cards.rs, they're not real tasks",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "description": "Use when the user wants a consolidated inventory of unfinished work across a whole repository, or help deciding what to do next. Triggers on `/backlog` and on any request to enumerate, round up, or prioritize outstanding work \u2014 e.g. \"what's left to do/build\", \"what should I work on next\", \"what's outstanding before this is done\", \"what should I pick up coming back to this project\", \"round up the issues / roadmap / TODOs / FIXMEs into one list\", or \"start a tech-debt doc from the code TODOs\". The intent is a survey of everything remaining (EPICs, roadmap items, TODO/FIXME/HACK comments, unreleased changelog entries, open GitHub issues), not fixing one item. Also covers creating or refreshing a BACKLOG.md or technical-debt doc. Trigger whenever the user clearly wants this overview even if they never say \"backlog\".",
+      "train_passed": 6,
+      "train_failed": 6,
+      "train_total": 12,
+      "train_results": [
+        {
+          "query": "is there a tech debt doc? if not start one by pulling all the TODO comments out of the source",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "what work is outstanding in this repo before I can call it done",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "round up the open github issues, the roadmap items and the FIXMEs into one place so i can prioritize",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "what's on the plate for this library \u2014 what's left to build",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "/backlog",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "i'm coming back to this project after a few months off, what should i pick up next?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "there's a FIXME in src/deck.rs about bounds checking, go fix it",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "add a new EPIC doc for a tournament-mode feature",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "explain how the bot self-play simulation works in this codebase",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "review this PR for bugs before I merge it",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "clean up the joke TODO comments in cards.rs, they're not real tasks",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "audit the downstream repos for breakage after this release",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        }
+      ],
+      "test_passed": 4,
+      "test_failed": 4,
+      "test_total": 8,
+      "test_results": [
+        {
+          "query": "give me an inventory of unfinished work across the whole codebase",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "make me a single list of everything that still needs doing here: features, half-finished stuff, tech debt, whatever you can find",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "can you go through the docs and code and give me a rundown of all the outstanding work \u2014 open EPICs, TODO comments lying around, that kind of thing",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "i want one view that shows the epic docs, the todo markers, and what's still open on github",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "what does EPIC-31 actually propose? summarize the PLO design doc for me",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "how many open issues are on github right now?",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "write release notes for the 0.1.5 release",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "implement the next item \u2014 go build pot-limit omaha",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        }
+      ],
+      "passed": 6,
+      "failed": 6,
+      "total": 12,
+      "results": [
+        {
+          "query": "is there a tech debt doc? if not start one by pulling all the TODO comments out of the source",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "what work is outstanding in this repo before I can call it done",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "round up the open github issues, the roadmap items and the FIXMEs into one place so i can prioritize",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "what's on the plate for this library \u2014 what's left to build",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "/backlog",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "i'm coming back to this project after a few months off, what should i pick up next?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "there's a FIXME in src/deck.rs about bounds checking, go fix it",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "add a new EPIC doc for a tournament-mode feature",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "explain how the bot self-play simulation works in this codebase",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "review this PR for bugs before I merge it",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "clean up the joke TODO comments in cards.rs, they're not real tasks",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "audit the downstream repos for breakage after this release",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        }
+      ]
+    },
+    {
+      "iteration": 3,
+      "description": "Use when the user wants the big picture of unfinished work in a repo, rather than help with one specific task. Invoke on `/backlog`, and whenever someone asks what's left to do or build, what's still outstanding before something's \"done\", what they should work on or pick up next (including returning to a project after time away), or asks to gather scattered work \u2014 open issues, roadmap items, EPICs, TODO/FIXME/HACK comments, unreleased changelog entries \u2014 into a single prioritized list. Also use to start or refresh a BACKLOG.md or a technical-debt doc seeded from code TODOs. The signal is a survey of everything remaining, not fixing, explaining, or reviewing one item. Trigger on this intent even when the word \"backlog\" is never used.",
+      "train_passed": 6,
+      "train_failed": 6,
+      "train_total": 12,
+      "train_results": [
+        {
+          "query": "what work is outstanding in this repo before I can call it done",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "round up the open github issues, the roadmap items and the FIXMEs into one place so i can prioritize",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "is there a tech debt doc? if not start one by pulling all the TODO comments out of the source",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "what's on the plate for this library \u2014 what's left to build",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "/backlog",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "i'm coming back to this project after a few months off, what should i pick up next?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "there's a FIXME in src/deck.rs about bounds checking, go fix it",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "add a new EPIC doc for a tournament-mode feature",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "explain how the bot self-play simulation works in this codebase",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "review this PR for bugs before I merge it",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "audit the downstream repos for breakage after this release",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "clean up the joke TODO comments in cards.rs, they're not real tasks",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        }
+      ],
+      "test_passed": 4,
+      "test_failed": 4,
+      "test_total": 8,
+      "test_results": [
+        {
+          "query": "give me an inventory of unfinished work across the whole codebase",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "make me a single list of everything that still needs doing here: features, half-finished stuff, tech debt, whatever you can find",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "can you go through the docs and code and give me a rundown of all the outstanding work \u2014 open EPICs, TODO comments lying around, that kind of thing",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "i want one view that shows the epic docs, the todo markers, and what's still open on github",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "what does EPIC-31 actually propose? summarize the PLO design doc for me",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "write release notes for the 0.1.5 release",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "how many open issues are on github right now?",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "implement the next item \u2014 go build pot-limit omaha",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        }
+      ],
+      "passed": 6,
+      "failed": 6,
+      "total": 12,
+      "results": [
+        {
+          "query": "what work is outstanding in this repo before I can call it done",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "round up the open github issues, the roadmap items and the FIXMEs into one place so i can prioritize",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "is there a tech debt doc? if not start one by pulling all the TODO comments out of the source",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "what's on the plate for this library \u2014 what's left to build",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "/backlog",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "i'm coming back to this project after a few months off, what should i pick up next?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "there's a FIXME in src/deck.rs about bounds checking, go fix it",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "add a new EPIC doc for a tournament-mode feature",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "explain how the bot self-play simulation works in this codebase",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "review this PR for bugs before I merge it",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "audit the downstream repos for breakage after this release",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "clean up the joke TODO comments in cards.rs, they're not real tasks",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        }
+      ]
+    },
+    {
+      "iteration": 4,
+      "description": "Use to take stock of everything unfinished in a repository and return one prioritized list of what's left. Always trigger on `/backlog`. Also trigger whenever someone wants an overview of remaining work rather than help with one task \u2014 for example: \"what's left to do/build here\", \"what's outstanding before this is done\", \"what should I work on next\", \"what should I pick up coming back to this project\", \"what's on the plate for this library\", or \"round up the open issues, roadmap items, EPICs, TODOs and FIXMEs into one place so I can prioritize\". Also use to start or refresh a BACKLOG.md, or to begin a tech-debt doc by pulling TODO/FIXME/HACK comments out of the source. The intent is a survey of all remaining work across the repo, not fixing, explaining, or reviewing a single item. Trigger on this intent even if the user never says \"backlog\".",
+      "train_passed": 6,
+      "train_failed": 6,
+      "train_total": 12,
+      "train_results": [
+        {
+          "query": "what's on the plate for this library \u2014 what's left to build",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "what work is outstanding in this repo before I can call it done",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "is there a tech debt doc? if not start one by pulling all the TODO comments out of the source",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "round up the open github issues, the roadmap items and the FIXMEs into one place so i can prioritize",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "there's a FIXME in src/deck.rs about bounds checking, go fix it",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "/backlog",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "i'm coming back to this project after a few months off, what should i pick up next?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "review this PR for bugs before I merge it",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "add a new EPIC doc for a tournament-mode feature",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "explain how the bot self-play simulation works in this codebase",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "audit the downstream repos for breakage after this release",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "clean up the joke TODO comments in cards.rs, they're not real tasks",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        }
+      ],
+      "test_passed": 4,
+      "test_failed": 4,
+      "test_total": 8,
+      "test_results": [
+        {
+          "query": "make me a single list of everything that still needs doing here: features, half-finished stuff, tech debt, whatever you can find",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "give me an inventory of unfinished work across the whole codebase",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "can you go through the docs and code and give me a rundown of all the outstanding work \u2014 open EPICs, TODO comments lying around, that kind of thing",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "i want one view that shows the epic docs, the todo markers, and what's still open on github",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "what does EPIC-31 actually propose? summarize the PLO design doc for me",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "how many open issues are on github right now?",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "write release notes for the 0.1.5 release",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "implement the next item \u2014 go build pot-limit omaha",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        }
+      ],
+      "passed": 6,
+      "failed": 6,
+      "total": 12,
+      "results": [
+        {
+          "query": "what's on the plate for this library \u2014 what's left to build",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "what work is outstanding in this repo before I can call it done",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "is there a tech debt doc? if not start one by pulling all the TODO comments out of the source",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "round up the open github issues, the roadmap items and the FIXMEs into one place so i can prioritize",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "there's a FIXME in src/deck.rs about bounds checking, go fix it",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "/backlog",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "i'm coming back to this project after a few months off, what should i pick up next?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "review this PR for bugs before I merge it",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "add a new EPIC doc for a tournament-mode feature",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "explain how the bot self-play simulation works in this codebase",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "audit the downstream repos for breakage after this release",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "clean up the joke TODO comments in cards.rs, they're not real tasks",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        }
+      ]
+    },
+    {
+      "iteration": 5,
+      "description": "Use to inventory all unfinished work across a repository and hand back one prioritized list of what's left. Trigger on `/backlog`. Also trigger whenever someone steps back to ask about the state of remaining work rather than acting on a single item: what's left to do or build here, what's outstanding before this is \"done\", what to work on or pick up next, what to resume after time away from a project, or any request to gather scattered signals \u2014 open issues, roadmap, EPICs, TODO/FIXME/HACK comments, unreleased changelog \u2014 into one place to prioritize. Use it to start or refresh a BACKLOG.md, or to begin a tech-debt doc by pulling TODO comments out of the source. This is a whole-repo survey of remaining work; don't use it to fix, explain, review, or add one specific item. Fire on this intent even when the word \"backlog\" never appears.",
+      "train_passed": 6,
+      "train_failed": 6,
+      "train_total": 12,
+      "train_results": [
+        {
+          "query": "what work is outstanding in this repo before I can call it done",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "is there a tech debt doc? if not start one by pulling all the TODO comments out of the source",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "what's on the plate for this library \u2014 what's left to build",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "round up the open github issues, the roadmap items and the FIXMEs into one place so i can prioritize",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "/backlog",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "there's a FIXME in src/deck.rs about bounds checking, go fix it",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "i'm coming back to this project after a few months off, what should i pick up next?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "add a new EPIC doc for a tournament-mode feature",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "review this PR for bugs before I merge it",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "audit the downstream repos for breakage after this release",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "explain how the bot self-play simulation works in this codebase",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "clean up the joke TODO comments in cards.rs, they're not real tasks",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        }
+      ],
+      "test_passed": 4,
+      "test_failed": 4,
+      "test_total": 8,
+      "test_results": [
+        {
+          "query": "give me an inventory of unfinished work across the whole codebase",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "make me a single list of everything that still needs doing here: features, half-finished stuff, tech debt, whatever you can find",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "can you go through the docs and code and give me a rundown of all the outstanding work \u2014 open EPICs, TODO comments lying around, that kind of thing",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "i want one view that shows the epic docs, the todo markers, and what's still open on github",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "what does EPIC-31 actually propose? summarize the PLO design doc for me",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "how many open issues are on github right now?",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "write release notes for the 0.1.5 release",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "implement the next item \u2014 go build pot-limit omaha",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        }
+      ],
+      "passed": 6,
+      "failed": 6,
+      "total": 12,
+      "results": [
+        {
+          "query": "what work is outstanding in this repo before I can call it done",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "is there a tech debt doc? if not start one by pulling all the TODO comments out of the source",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "what's on the plate for this library \u2014 what's left to build",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "round up the open github issues, the roadmap items and the FIXMEs into one place so i can prioritize",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "/backlog",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "there's a FIXME in src/deck.rs about bounds checking, go fix it",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "i'm coming back to this project after a few months off, what should i pick up next?",
+          "should_trigger": true,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": false
+        },
+        {
+          "query": "add a new EPIC doc for a tournament-mode feature",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "review this PR for bugs before I merge it",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "audit the downstream repos for breakage after this release",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "explain how the bot self-play simulation works in this codebase",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        },
+        {
+          "query": "clean up the joke TODO comments in cards.rs, they're not real tasks",
+          "should_trigger": false,
+          "trigger_rate": 0.0,
+          "triggers": 0,
+          "runs": 3,
+          "pass": true
+        }
+      ]
+    }
+  ]
+}

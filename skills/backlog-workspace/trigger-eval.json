@@ -1,0 +1,22 @@
+[
+  {"query": "/backlog", "should_trigger": true},
+  {"query": "i'm coming back to this project after a few months off, what should i pick up next?", "should_trigger": true},
+  {"query": "can you go through the docs and code and give me a rundown of all the outstanding work — open EPICs, TODO comments lying around, that kind of thing", "should_trigger": true},
+  {"query": "make me a single list of everything that still needs doing here: features, half-finished stuff, tech debt, whatever you can find", "should_trigger": true},
+  {"query": "round up the open github issues, the roadmap items and the FIXMEs into one place so i can prioritize", "should_trigger": true},
+  {"query": "is there a tech debt doc? if not start one by pulling all the TODO comments out of the source", "should_trigger": true},
+  {"query": "what work is outstanding in this repo before I can call it done", "should_trigger": true},
+  {"query": "give me an inventory of unfinished work across the whole codebase", "should_trigger": true},
+  {"query": "i want one view that shows the epic docs, the todo markers, and what's still open on github", "should_trigger": true},
+  {"query": "what's on the plate for this library — what's left to build", "should_trigger": true},
+  {"query": "review this PR for bugs before I merge it", "should_trigger": false},
+  {"query": "there's a FIXME in src/deck.rs about bounds checking, go fix it", "should_trigger": false},
+  {"query": "write release notes for the 0.1.5 release", "should_trigger": false},
+  {"query": "what does EPIC-31 actually propose? summarize the PLO design doc for me", "should_trigger": false},
+  {"query": "implement the next item — go build pot-limit omaha", "should_trigger": false},
+  {"query": "how many open issues are on github right now?", "should_trigger": false},
+  {"query": "audit the downstream repos for breakage after this release", "should_trigger": false},
+  {"query": "explain how the bot self-play simulation works in this codebase", "should_trigger": false},
+  {"query": "add a new EPIC doc for a tournament-mode feature", "should_trigger": false},
+  {"query": "clean up the joke TODO comments in cards.rs, they're not real tasks", "should_trigger": false}
+]

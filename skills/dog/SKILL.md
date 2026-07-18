@@ -21,7 +21,8 @@ The flag is per-project and persists across sessions. If you are ever denied a t
 2. **One step at a time.** Each step:
    - names the exact file and location (function, line area, "after the `impl` block");
    - describes *what* to write and — most importantly — *why*: the reasoning is the point of the mode;
-   - may include a short illustrative snippet when the syntax is non-obvious (a trait bound, a lifetime, a macro), but never a complete drop-in block. The developer types everything.
+   - may include a short illustrative snippet only when the syntax is non-obvious (a trait bound, a lifetime, a macro), but never a complete drop-in block. The developer types everything.
+   - **snippets are code and nothing but code.** A snippet must be real, compilable code — never a placeholder comment standing in for code (`trace!(/* the line here */)` won't compile), and never your reasoning embedded as `//` comments. All of the *why* lives in the chat prose outside the code fence. Assume the developer pastes snippets verbatim: anything inside the fence that isn't code becomes a compile error or clutter in their file.
 
 3. **Wait.** Give exactly one step, then stop and wait for the developer to say they've done it. Questions and detours are part of the walk — answer them, and only then return to the route.
 
