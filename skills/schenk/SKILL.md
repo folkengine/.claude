@@ -65,21 +65,38 @@ beats fall) and the grouping hierarchy, noting which preference rules
 
 Output dir: `docs/schenker/<slug>/` in the current project (create it).
 
-1. Copy `references/schenker.ily` (and `references/gttm.ily` if the GTTM
-   layer is on) into the output dir so it is self-contained.
+1. Copy into the output dir so it is self-contained: `references/schenker.ily`,
+   `references/gttm.ily` (if the GTTM layer is on), and `references/render.sh`.
 2. Read `references/notation-guide.md` **before writing any `.ly`** — it
-   documents the notation vocabulary and six known LilyPond gotchas.
-   Model the file on `references/example.ly` / `example-gttm.ly` and the
-   structure used there: one score, aligned staves Fg./Mg./Bg./bass, shared
-   hidden meter with spacer rests.
-3. Compile both formats:
-   `lilypond -dbackend=svg -o <slug> <slug>.ly` and `lilypond -o <slug> <slug>.ly`.
-4. On compile errors: read the log, fix, retry — at most ~3 attempts, then
+   documents the notation vocabulary, the per-level building-block files, and
+   the known LilyPond gotchas.
+3. Write the graph as **per-level building-block files** — one music-only file
+   per level: no `\header`/`\version`/`\include`/comments, just the variable
+   with its style, clef/key/time, and the markup that prints on the staff.
+   Keep the canonical names and variables (`render.sh` keys off them):
+   - `foreground.ly` → `fgMusic` (real notation; put any GTTM
+     `\startGroup`/`\stopGroup` grouping marks here — inert without the
+     bracket engraver, so the same file serves the plain and GTTM graphs)
+   - `middleground.ly` → `mgMusic`
+   - `background-urlinie.ly` → `bgUpper`
+   - `background-bass.ly` → `bgBass`
+   - `gttm-layer.ly` → `dotsEighth` / `dotsQuarter` / `dotsMeasure` (GTTM only)
+
+   Then write the thin assembly file `<slug>.ly` (and `<slug>-gttm.ly` when the
+   GTTM layer is on): `\version` + stylesheet `\include`s + `\include` of the
+   level files + one `\score` of aligned staves Fg./Mg./Bg./bass sharing a
+   hidden meter. Model on `references/example.ly` / `example-gttm.ly`.
+4. Render with the helper: `bash render.sh <output-dir>` (or `bash render.sh`
+   from inside it). It compiles SVG **and** PDF for every assembled graph and
+   for every per-level building block, so each level also gets a standalone
+   image for embedding.
+5. On compile errors: read the log, fix, retry — at most ~3 attempts, then
    deliver the `.ly` with an explanation. For elements that vanish silently,
    use the one-variable-per-staff bisection test from the notation guide.
-5. **View the rendered SVG** (rasterize and look at it) and check: beams
-   present, carets on the right notes, slurs sensible, levels aligned,
-   nothing colliding. Never declare success on exit code alone.
+6. **View the rendered SVGs** (rasterize and look) — the assembled graph and
+   the per-level images — and check: beams present, carets on the right notes,
+   slurs sensible, levels aligned, nothing colliding. Never declare success on
+   exit code alone.
 
 ### 6. Companion document
 
@@ -92,9 +109,12 @@ GPR/MPR reasoning) when enabled; embedded SVG image(s); a file table.
 
 | File | Content |
 |---|---|
-| `<slug>.ly` | LilyPond source of the graph |
+| `<slug>.ly` | assembly file: stylesheet + level `\include`s + one `\score` |
+| `foreground.ly` … `gttm-layer.ly` | per-level music-only building blocks |
 | `schenker.ily` (+ `gttm.ily` if used) | copied stylesheets |
-| `<slug>.svg`, `<slug>.pdf` | rendered graph |
+| `render.sh` | copied render helper (assembled graph + per-level SVG/PDF) |
+| `<slug>.svg`, `<slug>.pdf` | rendered assembled graph |
+| `foreground.svg/.pdf` … `gttm-layer.svg/.pdf` | rendered per-level images |
 | `<slug>.md` | prose analysis with embedded SVG |
 
 With the GTTM layer, either add it to the main graph or produce a second

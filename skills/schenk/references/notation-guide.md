@@ -54,6 +54,12 @@ choices in the companion prose instead.
    (`\gttmVoiceMods`), never a second layout variable.
 6. **SVG and PDF need separate runs**: `lilypond -dbackend=svg -o out file.ly`
    then `lilypond -o out file.ly`.
+7. **A wrapper must not share its include's name.** LilyPond searches the
+   including file's own directory *before* any `-I` path, so a wrapper named
+   `foreground.ly` that does `\include "foreground.ly"` includes itself and
+   hangs. When rendering a music-only level file standalone, name the wrapper
+   distinctly (`_render_foreground.ly`) and point `-I` at the level dir.
+   `render.sh` already does this.
 
 ## Debugging a graph that renders wrong
 
@@ -61,10 +67,42 @@ When an element silently vanishes, bisect: write a scratch file with one
 staff per candidate override, changing exactly one variable per staff, and
 render once. This finds the offending override in a single compile.
 
+## Per-level building blocks
+
+Each graph level lives in its own music-only file — just the variable, its
+style, clef/key/time, and the markup that prints on the staff. No `\header`,
+no `\version`/`\include`, no comments, so each is easy to edit and to `\include`
+into a score. All are keyed to one coherent C-major Ursatz (3̂–2̂–1̂ / I–V–I,
+three bars of 2/4) so they compose without adjustment.
+
+| File | Variable | Content |
+|---|---|---|
+| `foreground.ly` | `fgMusic` | real notation; carries GTTM `\startGroup`/`\stopGroup` marks (inert without the bracket engraver, so it drops into a plain graph unchanged) |
+| `middleground.ly` | `mgMusic` | filled stemless heads, prolongation slur over 3̂–2̂–1̂ |
+| `background-urlinie.ly` | `bgUpper` | open heads, caret degrees, Urlinie beam |
+| `background-bass.ly` | `bgBass` | open heads, Roman numerals, Bassbrechung beam |
+| `gttm-layer.ly` | `dotsEighth` / `dotsQuarter` / `dotsMeasure` | metrical dot-grid rows (one per level) |
+
+Assemble by `\include`-ing the levels you need after the stylesheets, then
+referencing the variables in the `\score` — see `example.ly` (all four Schenker
+levels) and `example-gttm.ly` (foreground + dot grid + Urlinie). Grouping
+brackets render only where the score enables the engraver via
+`\context { \Voice \gttmVoiceMods }`.
+
+**Rendering.** `render.sh <dir>` compiles SVG + PDF for every assembled graph
+in `<dir>` and for each per-level building block present there (keying off the
+canonical filenames/variables above). Because the blocks are music-only, it
+renders each through a disposable wrapper — see gotcha 7. The `<dir>` must
+contain `schenker.ily` (and `gttm.ily` when a GTTM layer is used).
+
 ## Smoke tests
 
-- `example.ly` — Ursatz in C major (3̂–2̂–1̂ over I–V–I); tests `schenker.ily`.
-- `example-gttm.ly` — adds dot grid + grouping brackets; tests `gttm.ily`.
+- `example.ly` — full C-major graph assembled from `foreground.ly`,
+  `middleground.ly`, `background-urlinie.ly`, `background-bass.ly`; tests
+  `schenker.ily`.
+- `example-gttm.ly` — assembles `foreground.ly` + `gttm-layer.ly` +
+  `background-urlinie.ly`, adding the dot grid and grouping brackets; tests
+  `gttm.ily`.
 
-Both must compile warning-free. If a stylesheet edit breaks them, fix the
-stylesheet before using it in a real analysis.
+Both must compile warning-free. If a stylesheet or building-block edit breaks
+them, fix it before using it in a real analysis.
