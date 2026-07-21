@@ -1,0 +1,382 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.2" width="210.00mm" height="297.00mm" viewBox="0.0000 -0.0000 119.5016 169.0094">
+<style type="text/css">
+<![CDATA[
+tspan { white-space: pre; }
+]]>
+</style>
+<g transform="translate(4.1655, 12.0573)">
+<text font-family="serif" font-weight="bold" font-size="3.4923" text-anchor="start" fill="currentColor">
+<tspan>Beethoven, Symphony No. 5 in C minor, op. 67 — whole-symphony Urlinie</tspan>
+</text>
+</g>
+<g transform="translate(16.1498, 15.5573)">
+<text font-family="serif" font-weight="bold" font-size="2.4697" text-anchor="start" fill="currentColor">
+<tspan>Very simplified background: 3-2-1 (E flat - D - C) over i - V - I; C minor to C major</tspan>
+</text>
+</g>
+<g transform="translate(15.3645, 27.4553)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.0500" y1="0" x2="47.9134" y2="0"/>
+</g>
+<g transform="translate(15.3645, 26.4553)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.0500" y1="0" x2="47.9134" y2="0"/>
+</g>
+<g transform="translate(15.3645, 25.4553)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.0500" y1="0" x2="47.9134" y2="0"/>
+</g>
+<g transform="translate(15.3645, 24.4553)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.0500" y1="0" x2="47.9134" y2="0"/>
+</g>
+<g transform="translate(15.3645, 23.4553)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.0500" y1="0" x2="47.9134" y2="0"/>
+</g>
+<g transform="translate(15.3645, 38.5165)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.0500" y1="0" x2="47.9134" y2="0"/>
+</g>
+<g transform="translate(15.3645, 37.5165)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.0500" y1="0" x2="47.9134" y2="0"/>
+</g>
+<g transform="translate(15.3645, 36.5165)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.0500" y1="0" x2="47.9134" y2="0"/>
+</g>
+<g transform="translate(15.3645, 35.5165)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.0500" y1="0" x2="47.9134" y2="0"/>
+</g>
+<g transform="translate(15.3645, 34.5165)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.0500" y1="0" x2="47.9134" y2="0"/>
+</g>
+<g transform="translate(15.3645, 47.5165)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.0500" y1="0" x2="47.9134" y2="0"/>
+</g>
+<g transform="translate(15.3645, 46.5165)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.0500" y1="0" x2="47.9134" y2="0"/>
+</g>
+<g transform="translate(15.3645, 45.5165)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.0500" y1="0" x2="47.9134" y2="0"/>
+</g>
+<g transform="translate(15.3645, 44.5165)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.0500" y1="0" x2="47.9134" y2="0"/>
+</g>
+<g transform="translate(15.3645, 43.5165)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.0500" y1="0" x2="47.9134" y2="0"/>
+</g>
+<g transform="translate(8.5358, 22.4553)">
+<rect x="25.6660" y="-0.1000" width="1.9563" height="0.2000" ry="0.1000" fill="currentColor"/>
+</g>
+<g transform="translate(10.0366, 37.0074)">
+<text font-family="serif" font-size="2.2000" text-anchor="start" fill="currentColor">
+<tspan>Bg.</tspan>
+</text>
+</g>
+<a style="color:inherit;" xlink:href="textedit:///Users/gaoler/src/github.com/folkengine/.claude/docs/schenker/beethoven5-symphony/background-urlinie.ly:6:2:3">
+<g transform="translate(24.9279, 35.0165)">
+<path transform="scale(0.0040, -0.0040)" d="M72 -106c40 0 204 110 231 143c7 9 11 19 11 28c0 22 -18 41 -42 41c-40 0 -204 -110 -231 -143c-7 -9 -10 -19 -10 -28c0 -22 17 -41 41 -41zM0 -67c0 71 46 203 258 203c41 0 86 -10 86 -69c0 -71 -46 -203 -258 -203c-41 0 -86 10 -86 69z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit:///Users/gaoler/src/github.com/folkengine/.claude/docs/schenker/beethoven5-symphony/background-urlinie.ly:6:5:6">
+<g transform="translate(24.9791, 32.7835)">
+<text font-family="serif" font-weight="bold" font-size="1.5552" text-anchor="start" fill="currentColor">
+<tspan>^</tspan>
+</text>
+</g>
+<g transform="translate(24.9279, 33.9835)">
+<text font-family="serif" font-size="1.9598" text-anchor="start" fill="currentColor">
+<tspan>3</tspan>
+</text>
+</g>
+</a>
+<g transform="translate(16.1645, 37.5165)">
+<path transform="scale(0.0040, -0.0040)" d="M266 -635h-6c-108 0 -195 88 -195 197c0 58 53 103 112 103c54 0 95 -47 95 -103c0 -52 -43 -95 -95 -95c-11 0 -21 2 -31 6c26 -39 68 -65 117 -65h4zM401 151c19 -89 48 -242 60 -354c76 27 112 94 112 163c0 89 -60 179 -172 191zM74 28c0 -112 98 -247 278 -247
+c21 0 44 2 68 6c-7 64 -29 203 -63 364c-79 -8 -124 -61 -124 -119c0 -44 25 -91 81 -123c5 -5 7 -10 7 -15c0 -11 -10 -22 -22 -22c-15 0 -126 62 -126 187c0 88 58 174 160 197c-14 58 -29 117 -46 175c-107 -121 -213 -243 -213 -403zM357 1194c28 0 143 -206 143 -361
+c0 -143 -86 -255 -180 -364c21 -68 39 -138 56 -207c5 0 10 1 14 1c155 0 255 -129 255 -262c0 -113 -74 -212 -180 -245c3 -35 5 -70 5 -105c0 -19 -1 -39 -2 -58c-7 -119 -88 -225 -202 -228l1 43c93 2 153 92 159 191c1 18 2 37 2 55c0 31 -1 61 -4 92
+c-28 -5 -55 -8 -80 -8c-239 0 -342 217 -342 374c0 177 131 306 248 441c-29 96 -52 170 -52 346c0 189 144 295 159 295zM247 782c0 -55 12 -115 35 -190c82 100 147 202 147 326c0 40 -6 82 -21 127c-49 -24 -161 -97 -161 -263z" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit:///Users/gaoler/src/github.com/folkengine/.claude/docs/schenker/beethoven5-symphony/background-urlinie.ly:3:2:3">
+<g transform="translate(19.7879, 36.5165)">
+<path transform="scale(0.0040, -0.0040)" d="M27 41l-1 -66v-11c0 -22 1 -44 4 -66c45 38 93 80 93 139c0 33 -14 67 -43 67c-31 0 -52 -30 -53 -63zM-15 -138l-12 595c8 5 18 8 27 8s19 -3 27 -8l-7 -345c25 21 58 34 91 34c52 0 89 -48 89 -102c0 -80 -86 -117 -147 -169c-15 -13 -24 -38 -45 -38
+c-13 0 -23 11 -23 25z" fill="currentColor"/>
+</g>
+<g transform="translate(20.7079, 35.0165)">
+<path transform="scale(0.0040, -0.0040)" d="M27 41l-1 -66v-11c0 -22 1 -44 4 -66c45 38 93 80 93 139c0 33 -14 67 -43 67c-31 0 -52 -30 -53 -63zM-15 -138l-12 595c8 5 18 8 27 8s19 -3 27 -8l-7 -345c25 21 58 34 91 34c52 0 89 -48 89 -102c0 -80 -86 -117 -147 -169c-15 -13 -24 -38 -45 -38
+c-13 0 -23 11 -23 25z" fill="currentColor"/>
+</g>
+<g transform="translate(21.6279, 37.0165)">
+<path transform="scale(0.0040, -0.0040)" d="M27 41l-1 -66v-11c0 -22 1 -44 4 -66c45 38 93 80 93 139c0 33 -14 67 -43 67c-31 0 -52 -30 -53 -63zM-15 -138l-12 595c8 5 18 8 27 8s19 -3 27 -8l-7 -345c25 21 58 34 91 34c52 0 89 -48 89 -102c0 -80 -86 -117 -147 -169c-15 -13 -24 -38 -45 -38
+c-13 0 -23 11 -23 25z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit:///Users/gaoler/src/github.com/folkengine/.claude/docs/schenker/beethoven5-symphony/background-bass.ly:6:2:3">
+<g transform="translate(24.9279, 46.0165)">
+<path transform="scale(0.0040, -0.0040)" d="M72 -106c40 0 204 110 231 143c7 9 11 19 11 28c0 22 -18 41 -42 41c-40 0 -204 -110 -231 -143c-7 -9 -10 -19 -10 -28c0 -22 17 -41 41 -41zM0 -67c0 71 46 203 258 203c41 0 86 -10 86 -69c0 -71 -46 -203 -258 -203c-41 0 -86 10 -86 69z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit:///Users/gaoler/src/github.com/folkengine/.claude/docs/schenker/beethoven5-symphony/background-bass.ly:6:4:5">
+<g transform="translate(24.9279, 49.3874)">
+<text font-family="serif" font-size="1.9598" text-anchor="start" fill="currentColor">
+<tspan>i</tspan>
+</text>
+</g>
+</a>
+<g transform="translate(16.1645, 44.5165)">
+<path transform="scale(0.0040, -0.0040)" d="M557 -125c0 28 23 51 51 51s51 -23 51 -51s-23 -51 -51 -51s-51 23 -51 51zM557 125c0 28 23 51 51 51s51 -23 51 -51s-23 -51 -51 -51s-51 23 -51 51zM232 263c172 0 293 -88 293 -251c0 -263 -263 -414 -516 -521c-3 -3 -6 -4 -9 -4c-7 0 -13 6 -13 13c0 3 1 6 4 9
+c202 118 412 265 412 493c0 120 -63 235 -171 235c-74 0 -129 -54 -154 -126c11 5 22 8 34 8c55 0 100 -45 100 -100c0 -58 -44 -106 -100 -106c-60 0 -112 47 -112 106c0 133 102 244 232 244z" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit:///Users/gaoler/src/github.com/folkengine/.claude/docs/schenker/beethoven5-symphony/background-bass.ly:3:2:3">
+<g transform="translate(19.7879, 46.5165)">
+<path transform="scale(0.0040, -0.0040)" d="M27 41l-1 -66v-11c0 -22 1 -44 4 -66c45 38 93 80 93 139c0 33 -14 67 -43 67c-31 0 -52 -30 -53 -63zM-15 -138l-12 595c8 5 18 8 27 8s19 -3 27 -8l-7 -345c25 21 58 34 91 34c52 0 89 -48 89 -102c0 -80 -86 -117 -147 -169c-15 -13 -24 -38 -45 -38
+c-13 0 -23 11 -23 25z" fill="currentColor"/>
+</g>
+<g transform="translate(20.7079, 45.0165)">
+<path transform="scale(0.0040, -0.0040)" d="M27 41l-1 -66v-11c0 -22 1 -44 4 -66c45 38 93 80 93 139c0 33 -14 67 -43 67c-31 0 -52 -30 -53 -63zM-15 -138l-12 595c8 5 18 8 27 8s19 -3 27 -8l-7 -345c25 21 58 34 91 34c52 0 89 -48 89 -102c0 -80 -86 -117 -147 -169c-15 -13 -24 -38 -45 -38
+c-13 0 -23 11 -23 25z" fill="currentColor"/>
+</g>
+<g transform="translate(21.6279, 47.0165)">
+<path transform="scale(0.0040, -0.0040)" d="M27 41l-1 -66v-11c0 -22 1 -44 4 -66c45 38 93 80 93 139c0 33 -14 67 -43 67c-31 0 -52 -30 -53 -63zM-15 -138l-12 595c8 5 18 8 27 8s19 -3 27 -8l-7 -345c25 21 58 34 91 34c52 0 89 -48 89 -102c0 -80 -86 -117 -147 -169c-15 -13 -24 -38 -45 -38
+c-13 0 -23 11 -23 25z" fill="currentColor"/>
+</g>
+</a>
+<g transform="translate(26.3053, 36.5165)">
+<rect x="-0.0000" y="-5.0000" width="0.0000" height="3.2410" ry="0.0000" fill="currentColor"/>
+</g>
+<g transform="translate(26.3053, 45.5165)">
+<rect x="-0.0000" y="-5.0000" width="0.0000" height="5.2410" ry="0.0000" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit:///Users/gaoler/src/github.com/folkengine/.claude/docs/schenker/beethoven5-symphony/background-bass.ly:6:21:22">
+<g transform="translate(26.3053, 40.5165)">
+<polygon stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0800" fill="currentColor" stroke="currentColor" points="28.7600 -0.2600 28.7600 0.2600 0.0400 0.2600 0.0400 -0.2600"/>
+</g>
+</a>
+<g transform="translate(28.7053, 36.5165)">
+<rect x="-0.0000" y="-5.0000" width="0.0000" height="3.2410" ry="0.0000" fill="currentColor"/>
+</g>
+<g transform="translate(28.7053, 45.5165)">
+<rect x="-0.0000" y="-5.0000" width="0.0000" height="5.2410" ry="0.0000" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit:///Users/gaoler/src/github.com/folkengine/.claude/docs/schenker/beethoven5-symphony/background-urlinie.ly:6:23:24">
+<g transform="translate(26.3053, 31.5165)">
+<polygon stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0800" fill="currentColor" stroke="currentColor" points="28.7600 -0.2600 28.7600 0.2600 0.0400 0.2600 0.0400 -0.2600"/>
+</g>
+</a>
+<g transform="translate(31.1053, 36.5165)">
+<rect x="-0.0000" y="-5.0000" width="0.0000" height="3.2410" ry="0.0000" fill="currentColor"/>
+</g>
+<g transform="translate(31.1053, 45.5165)">
+<rect x="-0.0000" y="-5.0000" width="0.0000" height="5.2410" ry="0.0000" fill="currentColor"/>
+</g>
+<g transform="translate(33.5053, 36.5165)">
+<rect x="-0.0000" y="-5.0000" width="0.0000" height="3.2410" ry="0.0000" fill="currentColor"/>
+</g>
+<g transform="translate(33.5053, 45.5165)">
+<rect x="-0.0000" y="-5.0000" width="0.0000" height="5.2410" ry="0.0000" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit:///Users/gaoler/src/github.com/folkengine/.claude/docs/schenker/beethoven5-symphony/middleground.ly:7:2:3">
+<g transform="translate(34.5279, 22.4553)">
+<path transform="scale(0.0040, -0.0040)" d="M0 -46c0 91 116 182 217 182c63 0 109 -35 109 -90c0 -87 -110 -182 -220 -182c-67 0 -106 39 -106 90z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit:///Users/gaoler/src/github.com/folkengine/.claude/docs/schenker/beethoven5-symphony/middleground.ly:7:6:7">
+<g transform="translate(34.9933, 17.8881)">
+<text font-family="serif" font-size="1.9598" text-anchor="start" fill="currentColor">
+<tspan>II</tspan>
+</text>
+</g>
+<g transform="translate(34.5279, 20.8881)">
+<text font-family="serif" font-size="1.9598" text-anchor="start" fill="currentColor">
+<tspan>A</tspan>
+</text>
+</g>
+<g transform="translate(36.0434, 20.8881)">
+<path transform="scale(0.0036, -0.0036)" d="M29 39l-2 -64v-11c0 -22 2 -43 5 -65c44 38 91 80 91 138c0 33 -13 66 -42 66c-31 0 -51 -31 -52 -64zM-28 454c9 5 18 8 28 8s19 -3 28 -8l-7 -343c25 23 58 36 92 36c51 0 87 -49 87 -103c0 -79 -84 -117 -144 -169c-16 -14 -25 -41 -47 -41c-14 0 -25 13 -25 27z" fill="currentColor"/>
+</g>
+</a>
+<g transform="translate(16.1645, 26.4553)">
+<path transform="scale(0.0040, -0.0040)" d="M266 -635h-6c-108 0 -195 88 -195 197c0 58 53 103 112 103c54 0 95 -47 95 -103c0 -52 -43 -95 -95 -95c-11 0 -21 2 -31 6c26 -39 68 -65 117 -65h4zM401 151c19 -89 48 -242 60 -354c76 27 112 94 112 163c0 89 -60 179 -172 191zM74 28c0 -112 98 -247 278 -247
+c21 0 44 2 68 6c-7 64 -29 203 -63 364c-79 -8 -124 -61 -124 -119c0 -44 25 -91 81 -123c5 -5 7 -10 7 -15c0 -11 -10 -22 -22 -22c-15 0 -126 62 -126 187c0 88 58 174 160 197c-14 58 -29 117 -46 175c-107 -121 -213 -243 -213 -403zM357 1194c28 0 143 -206 143 -361
+c0 -143 -86 -255 -180 -364c21 -68 39 -138 56 -207c5 0 10 1 14 1c155 0 255 -129 255 -262c0 -113 -74 -212 -180 -245c3 -35 5 -70 5 -105c0 -19 -1 -39 -2 -58c-7 -119 -88 -225 -202 -228l1 43c93 2 153 92 159 191c1 18 2 37 2 55c0 31 -1 61 -4 92
+c-28 -5 -55 -8 -80 -8c-239 0 -342 217 -342 374c0 177 131 306 248 441c-29 96 -52 170 -52 346c0 189 144 295 159 295zM247 782c0 -55 12 -115 35 -190c82 100 147 202 147 326c0 40 -6 82 -21 127c-49 -24 -161 -97 -161 -263z" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit:///Users/gaoler/src/github.com/folkengine/.claude/docs/schenker/beethoven5-symphony/middleground.ly:6:4:5">
+<g transform="translate(25.0303, 19.9185)">
+<text font-family="serif" font-size="1.9598" text-anchor="start" fill="currentColor">
+<tspan>I</tspan>
+</text>
+</g>
+<g transform="translate(24.9279, 22.9185)">
+<text font-family="serif" font-size="1.9598" text-anchor="start" fill="currentColor">
+<tspan>c</tspan>
+</text>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit:///Users/gaoler/src/github.com/folkengine/.claude/docs/schenker/beethoven5-symphony/middleground.ly:6:2:3">
+<g transform="translate(24.9279, 24.9553)">
+<path transform="scale(0.0040, -0.0040)" d="M0 -46c0 91 116 182 217 182c63 0 109 -35 109 -90c0 -87 -110 -182 -220 -182c-67 0 -106 39 -106 90z" fill="currentColor"/>
+</g>
+</a>
+<g transform="translate(35.9053, 36.5165)">
+<rect x="-0.0000" y="-5.0000" width="0.0000" height="3.2410" ry="0.0000" fill="currentColor"/>
+</g>
+<g transform="translate(35.9053, 45.5165)">
+<rect x="-0.0000" y="-5.0000" width="0.0000" height="5.2410" ry="0.0000" fill="currentColor"/>
+</g>
+<g transform="translate(38.3053, 36.5165)">
+<rect x="-0.0000" y="-5.0000" width="0.0000" height="3.2410" ry="0.0000" fill="currentColor"/>
+</g>
+<g transform="translate(38.3053, 45.5165)">
+<rect x="-0.0000" y="-5.0000" width="0.0000" height="5.2410" ry="0.0000" fill="currentColor"/>
+</g>
+<g transform="translate(40.7053, 36.5165)">
+<rect x="-0.0000" y="-5.0000" width="0.0000" height="3.2410" ry="0.0000" fill="currentColor"/>
+</g>
+<g transform="translate(40.7053, 45.5165)">
+<rect x="-0.0000" y="-5.0000" width="0.0000" height="5.2410" ry="0.0000" fill="currentColor"/>
+</g>
+<g transform="translate(43.1053, 36.5165)">
+<rect x="-0.0000" y="-5.0000" width="0.0000" height="3.2410" ry="0.0000" fill="currentColor"/>
+</g>
+<g transform="translate(43.1053, 45.5165)">
+<rect x="-0.0000" y="-5.0000" width="0.0000" height="5.2410" ry="0.0000" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit:///Users/gaoler/src/github.com/folkengine/.claude/docs/schenker/beethoven5-symphony/middleground.ly:8:2:3">
+<g transform="translate(44.1279, 24.9553)">
+<path transform="scale(0.0040, -0.0040)" d="M0 -46c0 91 116 182 217 182c63 0 109 -35 109 -90c0 -87 -110 -182 -220 -182c-67 0 -106 39 -106 90z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit:///Users/gaoler/src/github.com/folkengine/.claude/docs/schenker/beethoven5-symphony/middleground.ly:3:2:3">
+<g transform="translate(19.7879, 25.4553)">
+<path transform="scale(0.0040, -0.0040)" d="M27 41l-1 -66v-11c0 -22 1 -44 4 -66c45 38 93 80 93 139c0 33 -14 67 -43 67c-31 0 -52 -30 -53 -63zM-15 -138l-12 595c8 5 18 8 27 8s19 -3 27 -8l-7 -345c25 21 58 34 91 34c52 0 89 -48 89 -102c0 -80 -86 -117 -147 -169c-15 -13 -24 -38 -45 -38
+c-13 0 -23 11 -23 25z" fill="currentColor"/>
+</g>
+<g transform="translate(20.7079, 23.9553)">
+<path transform="scale(0.0040, -0.0040)" d="M27 41l-1 -66v-11c0 -22 1 -44 4 -66c45 38 93 80 93 139c0 33 -14 67 -43 67c-31 0 -52 -30 -53 -63zM-15 -138l-12 595c8 5 18 8 27 8s19 -3 27 -8l-7 -345c25 21 58 34 91 34c52 0 89 -48 89 -102c0 -80 -86 -117 -147 -169c-15 -13 -24 -38 -45 -38
+c-13 0 -23 11 -23 25z" fill="currentColor"/>
+</g>
+<g transform="translate(21.6279, 25.9553)">
+<path transform="scale(0.0040, -0.0040)" d="M27 41l-1 -66v-11c0 -22 1 -44 4 -66c45 38 93 80 93 139c0 33 -14 67 -43 67c-31 0 -52 -30 -53 -63zM-15 -138l-12 595c8 5 18 8 27 8s19 -3 27 -8l-7 -345c25 21 58 34 91 34c52 0 89 -48 89 -102c0 -80 -86 -117 -147 -169c-15 -13 -24 -38 -45 -38
+c-13 0 -23 11 -23 25z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit:///Users/gaoler/src/github.com/folkengine/.claude/docs/schenker/beethoven5-symphony/background-urlinie.ly:8:15:16">
+<g transform="translate(44.1279, 35.5165)">
+<path transform="scale(0.0040, -0.0040)" d="M72 -106c40 0 204 110 231 143c7 9 11 19 11 28c0 22 -18 41 -42 41c-40 0 -204 -110 -231 -143c-7 -9 -10 -19 -10 -28c0 -22 17 -41 41 -41zM0 -67c0 71 46 203 258 203c41 0 86 -10 86 -69c0 -71 -46 -203 -258 -203c-41 0 -86 10 -86 69z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit:///Users/gaoler/src/github.com/folkengine/.claude/docs/schenker/beethoven5-symphony/background-urlinie.ly:8:17:18">
+<g transform="translate(44.1791, 29.5565)">
+<text font-family="serif" font-weight="bold" font-size="1.5552" text-anchor="start" fill="currentColor">
+<tspan>^</tspan>
+</text>
+</g>
+<g transform="translate(44.1279, 30.7565)">
+<text font-family="serif" font-size="1.9598" text-anchor="start" fill="currentColor">
+<tspan>2</tspan>
+</text>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit:///Users/gaoler/src/github.com/folkengine/.claude/docs/schenker/beethoven5-symphony/background-bass.ly:8:15:16">
+<g transform="translate(44.1279, 47.5165)">
+<path transform="scale(0.0040, -0.0040)" d="M72 -106c40 0 204 110 231 143c7 9 11 19 11 28c0 22 -18 41 -42 41c-40 0 -204 -110 -231 -143c-7 -9 -10 -19 -10 -28c0 -22 17 -41 41 -41zM0 -67c0 71 46 203 258 203c41 0 86 -10 86 -69c0 -71 -46 -203 -258 -203c-41 0 -86 10 -86 69z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit:///Users/gaoler/src/github.com/folkengine/.claude/docs/schenker/beethoven5-symphony/background-bass.ly:8:18:19">
+<g transform="translate(44.1279, 49.8193)">
+<text font-family="serif" font-size="1.9598" text-anchor="start" fill="currentColor">
+<tspan>V</tspan>
+</text>
+</g>
+</a>
+<g transform="translate(45.5053, 36.5165)">
+<rect x="-0.0000" y="-5.0000" width="0.0000" height="3.7410" ry="0.0000" fill="currentColor"/>
+</g>
+<g transform="translate(45.5053, 45.5165)">
+<rect x="-0.0000" y="-5.0000" width="0.0000" height="6.7410" ry="0.0000" fill="currentColor"/>
+</g>
+<g transform="translate(47.9053, 36.5165)">
+<rect x="-0.0000" y="-5.0000" width="0.0000" height="3.7410" ry="0.0000" fill="currentColor"/>
+</g>
+<g transform="translate(47.9053, 45.5165)">
+<rect x="-0.0000" y="-5.0000" width="0.0000" height="6.7410" ry="0.0000" fill="currentColor"/>
+</g>
+<g transform="translate(9.4903, 26.1686)">
+<text font-family="serif" font-size="2.2000" text-anchor="start" fill="currentColor">
+<tspan>Mvt.</tspan>
+</text>
+</g>
+<g transform="translate(50.3053, 36.5165)">
+<rect x="-0.0000" y="-5.0000" width="0.0000" height="3.7410" ry="0.0000" fill="currentColor"/>
+</g>
+<g transform="translate(50.3053, 45.5165)">
+<rect x="-0.0000" y="-5.0000" width="0.0000" height="6.7410" ry="0.0000" fill="currentColor"/>
+</g>
+<g transform="translate(52.7053, 36.5165)">
+<rect x="-0.0000" y="-5.0000" width="0.0000" height="3.7410" ry="0.0000" fill="currentColor"/>
+</g>
+<g transform="translate(52.7053, 45.5165)">
+<rect x="-0.0000" y="-5.0000" width="0.0000" height="6.7410" ry="0.0000" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit:///Users/gaoler/src/github.com/folkengine/.claude/docs/schenker/beethoven5-symphony/middleground.ly:9:2:3">
+<g transform="translate(53.7279, 24.9553)">
+<path transform="scale(0.0040, -0.0040)" d="M0 -46c0 91 116 182 217 182c63 0 109 -35 109 -90c0 -87 -110 -182 -220 -182c-67 0 -106 39 -106 90z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit:///Users/gaoler/src/github.com/folkengine/.claude/docs/schenker/beethoven5-symphony/middleground.ly:9:4:5">
+<g transform="translate(53.7279, 19.9157)">
+<text font-family="serif" font-size="1.9598" text-anchor="start" fill="currentColor">
+<tspan>IV</tspan>
+</text>
+</g>
+<g transform="translate(54.1035, 22.9157)">
+<text font-family="serif" font-size="1.9598" text-anchor="start" fill="currentColor">
+<tspan>C</tspan>
+</text>
+</g>
+</a>
+<g transform="translate(15.3045, 35.4859)">
+<rect x="0.0000" y="-12.0806" width="0.1600" height="24.1612" ry="0.0500" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit:///Users/gaoler/src/github.com/folkengine/.claude/docs/schenker/beethoven5-symphony/background-urlinie.ly:9:15:16">
+<g transform="translate(53.7279, 36.0165)">
+<path transform="scale(0.0040, -0.0040)" d="M72 -106c40 0 204 110 231 143c7 9 11 19 11 28c0 22 -18 41 -42 41c-40 0 -204 -110 -231 -143c-7 -9 -10 -19 -10 -28c0 -22 17 -41 41 -41zM0 -67c0 71 46 203 258 203c41 0 86 -10 86 -69c0 -71 -46 -203 -258 -203c-41 0 -86 10 -86 69z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit:///Users/gaoler/src/github.com/folkengine/.claude/docs/schenker/beethoven5-symphony/background-urlinie.ly:9:17:18">
+<g transform="translate(53.7791, 29.5565)">
+<text font-family="serif" font-weight="bold" font-size="1.5552" text-anchor="start" fill="currentColor">
+<tspan>^</tspan>
+</text>
+</g>
+<g transform="translate(53.7279, 30.7565)">
+<text font-family="serif" font-size="1.9598" text-anchor="start" fill="currentColor">
+<tspan>1</tspan>
+</text>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit:///Users/gaoler/src/github.com/folkengine/.claude/docs/schenker/beethoven5-symphony/background-bass.ly:9:15:16">
+<g transform="translate(53.7279, 46.0165)">
+<path transform="scale(0.0040, -0.0040)" d="M72 -106c40 0 204 110 231 143c7 9 11 19 11 28c0 22 -18 41 -42 41c-40 0 -204 -110 -231 -143c-7 -9 -10 -19 -10 -28c0 -22 17 -41 41 -41zM0 -67c0 71 46 203 258 203c41 0 86 -10 86 -69c0 -71 -46 -203 -258 -203c-41 0 -86 10 -86 69z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit:///Users/gaoler/src/github.com/folkengine/.claude/docs/schenker/beethoven5-symphony/background-bass.ly:9:17:18">
+<g transform="translate(53.7279, 49.3244)">
+<text font-family="serif" font-size="1.9598" text-anchor="start" fill="currentColor">
+<tspan>I</tspan>
+</text>
+</g>
+</a>
+<g transform="translate(55.1053, 36.5165)">
+<rect x="-0.0000" y="-5.0000" width="0.0000" height="4.2410" ry="0.0000" fill="currentColor"/>
+</g>
+<g transform="translate(55.1053, 45.5165)">
+<rect x="-0.0000" y="-5.0000" width="0.0000" height="5.2410" ry="0.0000" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit:///Users/gaoler/src/github.com/folkengine/.claude/docs/schenker/beethoven5-symphony/middleground.ly:8:4:5">
+<g transform="translate(44.1279, 19.9185)">
+<text font-family="serif" font-size="1.9598" text-anchor="start" fill="currentColor">
+<tspan>III</tspan>
+</text>
+</g>
+<g transform="translate(44.6742, 22.9185)">
+<text font-family="serif" font-size="1.9598" text-anchor="start" fill="currentColor">
+<tspan>c</tspan>
+</text>
+</g>
+</a>
+</svg>
