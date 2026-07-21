@@ -31,7 +31,12 @@ trap 'rm -rf "$TMP"' EXIT
 svgpdf() {  # svgpdf <out-basename> <source.ly> [extra lilypond args...]
   local out="$1"; shift
   local src="$1"; shift
-  lilypond -dbackend=svg "$@" -o "$DIR/$out" "$src" >/dev/null 2>&1
+  # SVG: -dcrop trims the page to the music's bounding box (minimal padding).
+  # It writes <out>.cropped.svg alongside the full-page <out>.svg; promote the
+  # cropped one to <out>.svg so the published image has no page margins. The
+  # "LilyPond vX.Y.Z" footer is suppressed upstream via \paper (schenker.ily).
+  lilypond -dbackend=svg -dcrop "$@" -o "$DIR/$out" "$src" >/dev/null 2>&1
+  mv -f "$DIR/$out.cropped.svg" "$DIR/$out.svg"
   lilypond               "$@" -o "$DIR/$out" "$src" >/dev/null 2>&1
   echo "  $out.svg  $out.pdf"
 }

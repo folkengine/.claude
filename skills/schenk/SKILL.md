@@ -89,7 +89,9 @@ Output dir: `docs/schenker/<slug>/` in the current project (create it).
 4. Render with the helper: `bash render.sh <output-dir>` (or `bash render.sh`
    from inside it). It compiles SVG **and** PDF for every assembled graph and
    for every per-level building block, so each level also gets a standalone
-   image for embedding.
+   image for embedding. Each SVG is cropped to the music's bounding box
+   (`-dcrop`, minimal padding) and the "LilyPond vX.Y.Z" tagline is suppressed
+   (`\paper { tagline = ##f }` in `schenker.ily`), so the images embed cleanly.
 5. On compile errors: read the log, fix, retry — at most ~3 attempts, then
    deliver the `.ly` with an explanation. For elements that vanish silently,
    use the one-variable-per-staff bisection test from the notation guide.

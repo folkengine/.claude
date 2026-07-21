@@ -68,6 +68,15 @@ beamFillOff = {
 
 %% -------------------------------------------------------------- layout -----
 
+%% Applies to every file that includes this stylesheet (assembled graphs and
+%% the render.sh per-level wrappers alike): drop the "LilyPond vX.Y.Z" footer
+%% so nothing prints below the music. Padding is handled at render time by
+%% LilyPond's -dcrop (see render.sh), which trims the SVG to the music's
+%% bounding box.
+\paper {
+  tagline = ##f
+}
+
 %% Analytic score: no time signature, no barlines, no bar numbers,
 %% roughly proportional spacing so the levels align vertically.
 schenkerLayout = \layout {
