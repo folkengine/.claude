@@ -10,17 +10,21 @@ if it might look like an oversight).
 # Dependency Audit
 
 **Audited:** <YYYY-MM-DD> at <short-commit> · <toolchain, e.g. rustc 1.94.1>
-**Scope:** <N> direct dependencies (<M> third-party, <K> first-party), full
-resolved tree of <T> crates
+**Scope:** <N> direct shipping dependencies (<M> third-party, <K>
+first-party), shipping graph of <T> crates (host target; <T2> across all
+targets). Dev-dependencies add <D> crates that never ship.
 **Method:** /untangle — evidence commands in the appendix; scores use the
 1–5 anchors, verdicts use the controlled vocabulary.
 
 ## Summary
 
-<!-- REQUIRED columns, exactly these. One row per direct dependency.
-     Verdict ∈ keep | drop | replace-std | rewrite | vendor-partial |
-     vendor-full | absorb
-     Unique baggage = crates that leave the resolved graph if this
+<!-- REQUIRED columns, exactly these. One row per direct SHIPPING (normal)
+     dependency — including optional and target-gated ones (mark them in
+     their dossiers). Dev-dependencies never get rows here; they live in
+     the Dev-dependencies table.
+     Verdict ∈ keep | drop | demote-to-dev | replace-std | rewrite |
+     vendor-partial | vendor-full | absorb
+     Unique baggage = crates that leave the shipping graph if this
      dependency's node vanishes entirely. When another dependency still holds
      the crate, write `0 via <holder>` here and give both numbers
      (direct-edge removal vs node-vanishes) in the Evidence appendix. -->
@@ -43,7 +47,9 @@ resolved tree of <T> crates
 - **License:** <SPDX> · **Last release:** <date or `unchecked`> ·
   **Advisories:** <none | RUSTSEC-… | unchecked>
 - **Features used:** <list; note if the dep is optional/feature-gated>
-- **Usage census:** <F> files, <C> call sites, <D> derive sites, <I> imports
+- **Usage census:** shipping: <F> files, <C> call sites, <D> derive sites,
+  <I> imports (`src/` outside `#[cfg(test)]`); dev: <X> call sites in
+  tests/examples/benches — **both halves REQUIRED, even when a half is 0**
 - **Public API leakage:** <none | list each leaking item `path:line`>
 - **Contract exposure:** <persisted files / wire formats / downstream repos
   that depend on this dep's output, or none>
@@ -71,7 +77,9 @@ resolved tree of <T> crates
 
 ## Dev-dependencies
 
-<!-- Light touch only — these never ship to consumers. No dossiers. -->
+<!-- Light touch only — these never ship to consumers. No dossiers.
+     Note duplicate versions that exist only via this graph, marked
+     non-shipping, so nobody chases them as consumer bloat. -->
 | Dependency | Version | License | Role |
 |---|---|---|---|
 
@@ -79,8 +87,12 @@ resolved tree of <T> crates
 
 <!-- REQUIRED. Raw, diffable outputs the next audit compares against.
      Include at minimum: -->
-- `cargo tree -d` output (duplicate versions)
-- Per-dep census numbers as one table: dep | files | call sites | derives
+- Graph-size baselines from `cargo tree` (never `cargo metadata` package
+  counts), unique crates excluding the root, each labeled: shipping graph
+  host target, shipping graph `--target all`, dev-inclusive graph
+- `cargo tree -d` output, partitioned shipping vs dev-only
+- Per-dep census numbers as one table: dep | shipping files | shipping call
+  sites | derives | dev-side count
 - Per-dep unique-baggage counts (`cargo tree -i` / subtree analysis)
 - Tool availability: which opportunistic tools ran (machete/udeps, audit/
   deny, license) and which were absent or offline

@@ -7,7 +7,7 @@ description: Evaluate how entangled a repository is with each of its dependencie
 
 Map how a repository actually depends on each thing it pulls in, what each
 dependency would cost to remove, and — when removal is worth it — perform the
-removal cleanly. Two guiding principles:
+removal cleanly. Three guiding principles:
 
 - **This is an ownership map, not a purge manifesto.** `keep` is a first-class
   verdict and must be argued as explicitly as any removal. The output's value
@@ -16,6 +16,12 @@ removal cleanly. Two guiding principles:
 - **Evidence before verdicts.** Every score and verdict traces to numbers in
   the Evidence appendix, produced by the standard commands below, so the next
   audit run can be diffed against this one.
+- **Shipping vs dev is the first cut.** The audit's subject is the normal
+  (shipping) dependency graph — what consumers inherit, including optional
+  and target-gated deps. Dev-dependencies (tests, examples, benches) never
+  ship and get the light-touch table only. Classify usage by where the call
+  site lives, not where the dependency is declared, and label every count in
+  the report with the graph it measures.
 
 ## Modes
 
@@ -47,13 +53,21 @@ verdict changed.
 Required baseline is only the package manager + `rg`. Run:
 
 - `cargo metadata --format-version 1` — versions, **licenses**, feature flags,
-  which deps are optional.
-- `cargo tree -e normal` and per-dep `cargo tree -i <dep>` — what each direct
+  which deps are optional. Its package count is **not** a size metric: it is
+  unfiltered by target and includes dev-deps and inactive optional edges.
+- `cargo tree -e normal` — the **shipping graph**, the audit's subject.
+  Record the canonical baselines as unique crates excluding the root:
+  host target, `--target all`, and the dev-inclusive count (no `-e` filter)
+  for contrast — label each. Per-dep `cargo tree -i <dep>` — what each direct
   dep uniquely drags in (its *baggage*) and what depends on it.
-- `cargo tree -d` — duplicate versions in the resolved graph (compile-time
-  bloat findings live here).
+- `cargo tree -d` — duplicate versions. **Partition shipping vs dev-only**
+  (reachable only via dev-deps): dev-only duplicates never reach consumers
+  and are reported as such, never as shipping bloat.
 - Per-dep census with `rg`: `use <dep>` imports, call sites, files touched,
-  and `derive(...)` attributes referencing the dep's macros.
+  and `derive(...)` attributes referencing the dep's macros — **two counts
+  per dep**: shipping code (`src/` outside `#[cfg(test)]` modules and
+  doc-test fences) and dev code (`tests/`, `examples/`, `benches/`, test
+  modules). The split is what surfaces misclassified dependencies.
 - Opportunistic, if installed — degrade silently when absent: `cargo machete`
   or `cargo udeps` (unused deps → `drop` candidates), `cargo audit` /
   `cargo deny` (advisories), `cargo license`.
@@ -69,6 +83,12 @@ appendix is what makes the next run comparable.
 The census can't answer the questions that dominate removal cost. For each
 third-party dep, answer explicitly:
 
+- **Does it actually ship?** — decided by call site, not declaration: a
+  `[dependencies]` entry whose only usage is in `tests/`, `examples/`,
+  `benches/`, or `#[cfg(test)]` modules is misclassified — verdict
+  `demote-to-dev`, not `keep` or `drop`. Converse trap: usage behind a
+  feature that examples enable via `required-features` is still shipping
+  usage.
 - **Public API leakage** — do the dep's types/traits appear in this crate's
   exported signatures (including trait impls downstream consumers rely on)?
   This is the single biggest cost driver: leakage means removal is a breaking
@@ -115,6 +135,7 @@ ad hoc.**
 |---|---|
 | `keep` | Ownership cost < removal cost; justify explicitly |
 | `drop` | Unused (confirm with machete/udeps); just delete |
+| `demote-to-dev` | Declared in `[dependencies]` but used only by tests/examples/benches; move it to `[dev-dependencies]` — consumers stop inheriting it, no code changes |
 | `replace-std` | Standard library already covers the usage |
 | `rewrite` | Re-implement the small used slice fresh from observed behavior; no upstream code copied |
 | `vendor-partial` | Copy the used portion in-tree with full attribution |
@@ -159,8 +180,10 @@ host is copyleft):
 **Gate 2 — enumerate and estimate.** List the exact items used (traits,
 functions, types, macros) and estimate vendored LOC including transitive
 internal helpers. Confirm each used item actually has callers (src, examples,
-tests, known downstream) — a dependency serving dead code is a `drop`, not an
-extraction. If the estimate balloons past what the audit predicted, abort
+tests, known downstream) — a dependency serving dead code is a `drop`, and
+one whose callers are all in tests/examples/benches is a `demote-to-dev` (a
+manifest move, not an extraction); abort either back to report mode. If the
+estimate balloons past what the audit predicted, abort
 back to report mode and change the verdict — do not keep pulling thread.
 
 **Gate 3 — choose copy or rewrite** per the fork above.
@@ -200,7 +223,10 @@ size) — and an `rg` sweep proving no references remain. Then hand the user sug
 Same three-phase method (evidence → judgment → template); swap the evidence
 commands: npm → `npm ls --all`, `npx license-checker`; Python → `pipdeptree`,
 `pip-licenses`; Go → `go mod graph`, `go-licenses`. Census stays `rg`-based.
-Expect thinner tooling and say so in the report rather than skipping fields.
+The shipping/dev split carries everywhere the names differ: npm
+`dependencies` vs `devDependencies`, Python project deps vs dev groups /
+extras, Go imports appearing only in `_test.go` files. Expect thinner
+tooling and say so in the report rather than skipping fields.
 
 ## Common mistakes
 
@@ -212,6 +238,9 @@ Expect thinner tooling and say so in the report rather than skipping fields.
 | Partial-vendoring a hub crate (a "part of serde") | Gate 2 balloon-abort; the verdict was wrong, fix it in the report |
 | Treating first-party crates as third-party risk | Absorption rubric; the cost is two-place maintenance, not trust |
 | Analyzing only direct deps' own code | Duplicates (`cargo tree -d`) and unique baggage are where tree wins hide |
+| Quoting `cargo metadata`'s package count as the footprint | It counts dev-deps, all targets, and inactive optionals; size the shipping graph with `cargo tree -e normal` |
+| Chasing duplicates that exist only via dev-deps | Partition `cargo tree -d` first; dev-only duplicates never reach consumers |
+| A census that merges `src/` with tests/examples usage | Two counts per dep (shipping vs dev); the split is what surfaces `demote-to-dev` candidates |
 | Reading upstream source, then calling it a rewrite | That is a copy — attribute it fully |
 | Skipping the approval gate because the change is small | Gate 4 is unconditional in extract mode |
 | Attribution only in a docs folder the package excludes | Root-level `LICENSE-THIRD-PARTY.md` + prove it ships (`cargo package --list`) |
