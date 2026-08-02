@@ -277,10 +277,16 @@ this file only points, it never repeats.
 Run this section LAST, after every file above already exists — toolchain
 decisions must exist before you write rationale about them.
 
-1. Check whether `/Users/christoph/.claude/plugins/cache/scaccogatto/okf/0.4.0/skills/okf/scripts/okf_init.py` exists.
-   - If it exists, run:
+1. Locate the OKF plugin's init script — discover it at run time, never
+   assume a user or version:
+   ```
+   OKF_INIT=$(ls -d "$HOME"/.claude/plugins/cache/scaccogatto/okf/*/skills/okf/scripts/okf_init.py 2>/dev/null | sort -V | tail -1)
+   ```
+   (`sort -V | tail -1` picks the newest installed plugin version if
+   several are cached.)
+   - If `$OKF_INIT` is non-empty, run:
      ```
-     uv run /Users/christoph/.claude/plugins/cache/scaccogatto/okf/0.4.0/skills/okf/scripts/okf_init.py .okf --title "<project>"
+     uv run "$OKF_INIT" .okf --title "<project>"
      ```
    - If it does not exist, hand-write the fallback bundle yourself:
      - `.okf/index.md` — frontmatter `okf_version: "0.1"` only, plus a
@@ -306,12 +312,13 @@ decisions must exist before you write rationale about them.
      daily.
    Update `index.md`'s concept listing to include both new files (whichever
    path created `index.md`).
-3. Validate the bundle: check whether
-   `/Users/christoph/.claude/plugins/cache/scaccogatto/okf/0.4.0/skills/validate/scripts/okf_validate.py`
-   exists.
-   - If it exists, run:
+3. Validate the bundle: locate the validator the same way as step 1:
+   ```
+   OKF_VALIDATE=$(ls -d "$HOME"/.claude/plugins/cache/scaccogatto/okf/*/skills/validate/scripts/okf_validate.py 2>/dev/null | sort -V | tail -1)
+   ```
+   - If `$OKF_VALIDATE` is non-empty, run:
      ```
-     uv run /Users/christoph/.claude/plugins/cache/scaccogatto/okf/0.4.0/skills/validate/scripts/okf_validate.py .okf --strict
+     uv run "$OKF_VALIDATE" .okf --strict
      ```
      (equivalently, invoke the `/okf:validate` skill).
    - If it does not exist, state plainly in your output that OKF validation
