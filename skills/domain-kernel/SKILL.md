@@ -144,9 +144,12 @@ Write the charter that names and positions the pattern. Use
 from reading as a rename: **lead with the synthesis** — functional-core purity +
 hexagonal delivery-agnosticism, made portable and runtime-enforced via the
 component model — and position explicitly against DDD's Shared Kernel and Core
-Domain and against Microkernel architecture, since readers will otherwise
-pattern-match it to one of those. Rationale and the prior-art map are in
-`references/charter.md`.
+Domain, against Microkernel architecture, and against hexagonal architecture
+itself, since readers will otherwise pattern-match it to one of those (or
+assume it's just hexagonal by another name). Rationale and the prior-art map
+are in `references/charter.md`; the detailed hexagonal-vs-domain-kernel
+comparison — including a walkthrough against a conventional TS/Java/Kotlin/Go
+hexagonal implementation — is in `references/hexagonal-comparison.md`.
 
 ---
 

@@ -36,6 +36,13 @@ The term is mostly unclaimed but sits among look-alikes; differentiate each:
 - **Clean Architecture entities/use-cases** — compatible, but framed around
   dependency direction; the domain kernel is framed around purity + a portable,
   runtime-enforced boundary.
+- **Hexagonal / Ports and Adapters (Cockburn)** — the closest ancestor, not just
+  a neighbor: a domain kernel is a hexagonal core with purity additionally
+  mandated and the boundary additionally made language-neutral and
+  structurally enforced. State that subset relationship explicitly, or readers
+  will assume "domain kernel" is hexagonal with new branding. Full comparison,
+  including a walkthrough against a conventional multi-language hexagonal
+  implementation, in `references/hexagonal-comparison.md`.
 
 ## Honest limits to include
 
