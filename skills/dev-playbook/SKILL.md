@@ -80,12 +80,18 @@ roster. Never read more than one stack file per run.
    baseline.md § Devcontainer), manifest pins. Bump GitHub Actions `uses:`
    versions too.
 5. **Update dependencies** — run the stack file's Update-section commands.
-6. **Verify** — `make ayce` to green, security-scan included. If an upgrade
+6. **Drift check** — for each generated file the stack file defines a
+   drift probe for (its Update section names them), regenerate what the
+   current toolchain would produce and diff against the repo's file.
+   REPORT divergence with the actual diff; never silently rewrite — after
+   the first commit these files belong to the user. Offer to apply the
+   fresh output only if the user asks.
+7. **Verify** — `make ayce` to green, security-scan included. If an upgrade
    breaks the build, report the offender and offer to hold it back pinned so
    the rest lands.
-7. **Record** — append dated `.okf/log.md` entry; update
+8. **Record** — append dated `.okf/log.md` entry; update
    `.okf/decisions/toolchain.md` if a tool (not just a version) changed.
-8. **Hand off** — report what changed and why; print git commands, never run.
+9. **Hand off** — report what changed and why; print git commands, never run.
 
 ## Hard rules
 

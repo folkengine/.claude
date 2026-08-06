@@ -23,8 +23,8 @@ touch any of these four locations, and verify all four agree, every time):
 > java toolchain) MUST agree; verify all four whenever any changes.
 
 Apply layers in this order, after the stack's native init has already run:
-baseline files (this document) → AI files (CLAUDE.md, copilot-instructions.md)
-→ stack configs (stack file, Config files / Quality gate / CI sections) →
+baseline files (this document) → AI files (CLAUDE.md,
+copilot-instructions.md, AI-BOM.md) → stack configs (stack file, Config files / Quality gate / CI sections) →
 `.okf/` seeding (this document, § OKF seeding — always last).
 
 Never hardcode an exact language or tool version anywhere you write from this
@@ -57,6 +57,7 @@ that contains those placeholders.
 | `.devcontainer/devcontainer.json` | generated | See § Devcontainer below. |
 | `CLAUDE.md` | generated | See § CLAUDE.md skeleton below. |
 | `.github/copilot-instructions.md` | generated | See § CLAUDE.md skeleton below (three lines). |
+| `AI-BOM.md` | `assets/AI-BOM.md.tmpl` | Copy, substitute `{{project}}`; then replace the placeholder row in "AI tools in use" with the agent + model actually performing the scaffold, resolved at run time (e.g. `Claude Code` / the current model / role `scaffolding`) — never leave the placeholder comment row in the generated file. |
 | `.okf/` | generated | See § OKF seeding below — apply this step LAST, after everything above exists. |
 
 ## § README shape
@@ -64,8 +65,9 @@ that contains those placeholders.
 Generate `README.md` with, in this order:
 
 1. **Badge row** — one badge per line, in this order: CI workflow badge, then
-   Contributor Covenant, then one license badge per license the user chose.
-   Port the markdown shape verbatim from the badge row style below (this was
+   Contributor Covenant, then one license badge per license the user chose,
+   then the AI-BOM badge last (always present — every scaffold ships an
+   `AI-BOM.md`). Port the markdown shape verbatim from the badge row style below (this was
    ported read-only from `rs_blank/README.md` lines 1-7 — adapt only the repo
    path, org, and license set to the new project; keep the same badge
    services and image styles):
@@ -76,6 +78,7 @@ Generate `README.md` with, in this order:
    [![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE-MIT)
    [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square)](LICENSE-APACHE)
    [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
+   [![AI-BOM](https://img.shields.io/badge/AI--BOM-declared-8A2BE2?style=flat-square)](AI-BOM.md)
    ```
 
    The Contributor Covenant badge's version number MUST match the version

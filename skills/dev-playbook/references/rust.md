@@ -199,10 +199,19 @@ pedantic = { level = "warn", priority = -1 }
 ```
 
 Add stack-appropriate ignores to the shared `.gitignore` (baseline writes
-the file; these are the Rust-specific lines): `/target`, `Cargo.lock`
-(omit this line instead — i.e. do NOT ignore `Cargo.lock` — for binaries;
-DO ignore it for pure libraries per common Rust convention; ask the user
-which applies if ambiguous), `**/*.rs.bk`.
+the file; these are the Rust-specific lines): exactly the lines `cargo
+init` itself would generate — nothing more. Because the real init runs
+with `--vcs none` (which suppresses `.gitignore` generation), discover
+them at scaffold time with a throwaway probe rather than from memory:
+
+```sh
+d=$(mktemp -d) && (cd "$d" && cargo init --vcs git --name probe -q) && cat "$d/.gitignore" && rm -rf "$d"
+```
+
+(currently that's just `/target`, for both lib and bin shapes). Do NOT
+add `Cargo.lock` to the ignores — cargo stopped ignoring it and current
+guidance is to commit the lockfile even for pure libraries. Do not add
+`**/*.rs.bk` or other legacy patterns cargo no longer emits.
 
 For `.editorconfig`, add a Rust override: 4-space indent for `*.rs`.
 
@@ -525,5 +534,16 @@ On `/dev-playbook update` for a Rust repo:
 4. Run `cargo deny check` after any dependency or license-set change —
    catches newly introduced disallowed licenses, banned crates, or
    yanked advisories before they land.
-5. Run `make ayce` and confirm it is green before considering the update
+5. **Drift probe: `.gitignore`** (feeds SKILL.md Flow 2's drift-check
+   step). Re-run the probe from `## Config files`:
+
+   ```sh
+   d=$(mktemp -d) && (cd "$d" && cargo init --vcs git --name probe -q) && cat "$d/.gitignore" && rm -rf "$d"
+   ```
+
+   The repo's `.gitignore` should be exactly this output plus the
+   baseline-owned `.idea/` line (and any lines the user added themselves —
+   user additions are not drift). If cargo's output has gained or changed
+   lines the repo lacks, report the diff; never silently rewrite.
+6. Run `make ayce` and confirm it is green before considering the update
    done.
