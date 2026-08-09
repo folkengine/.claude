@@ -183,7 +183,12 @@ sync_dir() {
             fi
             printf '        repo:  %s\n' "$entry"
             printf '        local: %s\n' "$dst/$name"
-            diff -rq "$entry" "$dst/$name" 2>&1 | sed 's/^/          /' | head -5
+            # diff exits 1 precisely when it finds differences, which is the
+            # only case that reaches here. Under `set -e` with pipefail that
+            # would abort the run inside the branch whose job is to report the
+            # conflict, so the status is swallowed deliberately.
+            { diff -rq "$entry" "$dst/$name" 2>&1 || true; } \
+                | sed 's/^/          /' | head -5
         fi
         # State is deliberately left alone: the two sides are still out of
         # sync, so the old baseline remains the last point they agreed.
