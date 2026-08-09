@@ -270,7 +270,8 @@ curl -s https://api.github.com/repos/<owner>/<repo>/releases/latest \
   | python3 -c 'import json,sys; print(json.load(sys.stdin)["tag_name"])'
 ```
 
-Take the major from the returned tag (`v7.0.1` → pin `@v7`). Pin the major
+Take the major from the returned tag (`v7.0.1` → pin `@v7`; some repos
+tag without the `v` prefix — `2.37.2` → pin `@v2` all the same). Pin the major
 only, never the full patch tag: majors are the moving refs GitHub maintains
 for exactly this purpose, and a patch pin turns every action release into
 manual maintenance.
@@ -301,6 +302,7 @@ it exists so that eight stack files do not each carry their own.
 | `astral-sh/setup-uv` | `v9` | 2026-08-09 |
 | `golangci/golangci-lint-action` | `v9` | 2026-08-09 |
 | `gradle/actions/setup-gradle` | `v6` | 2026-08-09 |
+| `shivammathur/setup-php` | `v2` | 2026-08-09 |
 | `EmbarkStudios/cargo-deny-action` | `v2` | 2026-08-09 |
 | `bazel-contrib/setup-bazel` | `0.19` | 2026-08-09 |
 

@@ -1,6 +1,6 @@
 ---
 name: dev-playbook
-description: Use when the user types /dev-playbook, asks to start, scaffold, bootstrap, or init a new project/repo/library in rust, python, go, java, cpp, c, ts-lib, or ts-next, or asks to bump/update an existing playbook repo's toolchain, dependencies, or language version. Replaces forking the devplaybooks GitHub org templates.
+description: Use when the user types /dev-playbook, asks to start, scaffold, bootstrap, or init a new project/repo/library in rust, python, go, java, cpp, c, php, ts-lib, or ts-next, or asks to bump/update an existing playbook repo's toolchain, dependencies, or language version. Replaces forking the devplaybooks GitHub org templates.
 ---
 
 # Dev Playbook
@@ -27,6 +27,7 @@ roster. Never read more than one stack file per run.
 | java | references/java.md | maven vs gradle; JDK version (default 21) |
 | cpp | references/cpp.md | cmake vs bazel; gtest vs catch2 (bazel→gtest only) |
 | c | references/c.md | — |
+| php | references/php.md | lib vs app; package name (vendor/name); namespace root |
 | ts-lib | references/ts-lib.md | package scope; entry points |
 | ts-next | references/ts-next.md | — (create-next-app runs its own) |
 
@@ -67,7 +68,8 @@ roster. Never read more than one stack file per run.
 
 1. **Detect** stack from `.tool-versions` + manifests (Cargo.toml,
    pyproject.toml, go.mod, pom.xml/build.gradle*, CMakeLists.txt/MODULE.bazel,
-   Makefile-with-cc-rules + Check-based tests/ for c, package.json). Read the matching stack file. On a repo
+   Makefile-with-cc-rules + Check-based tests/ for c, composer.json,
+   package.json). Read the matching stack file. On a repo
    that only partially matches playbook conventions, list what was and wasn't
    recognized and touch only the recognized parts.
 2. **Dirty-tree check** — `git status --porcelain`; if dirty, warn and get
