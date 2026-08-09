@@ -210,11 +210,12 @@ script; do not duplicate the `govulncheck` invocation anywhere else.
 ## CI
 
 Generate `.github/workflows/ci.yaml` from baseline's triggers block (push,
-pull_request, monthly cron) with these jobs. Use `actions/setup-go@v5` for
+pull_request, monthly cron) with these jobs. Use `actions/setup-go@<resolved-major>` for
 toolchain setup, reading the version from `go.mod` (`go-version-file:
-go.mod`) so the CI toolchain can never drift from the manifest pin; pin
-`actions/checkout` and `golangci-lint-action` to current major versions at
-scaffold time:
+go.mod`) so the CI toolchain can never drift from the manifest pin. Resolve
+every `@<resolved-major>` below at scaffold time — see baseline.md, § CI
+workflows → Action version pins, for the procedure and the offline fallback
+table. Never write a major copied from this file:
 
 ```yaml
 name: CI
@@ -234,8 +235,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@<resolved-major>
+      - uses: actions/setup-go@<resolved-major>
         with:
           go-version-file: go.mod
       - run: go build -o out/ ./...
@@ -246,11 +247,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@<resolved-major>
+      - uses: actions/setup-go@<resolved-major>
         with:
           go-version-file: go.mod
-      - uses: golangci/golangci-lint-action@v9
+      - uses: golangci/golangci-lint-action@<resolved-major>
         with:
           version: latest
 ```
@@ -264,11 +265,11 @@ adjust both together.
 Generate `.github/workflows/security.yaml` per baseline's exact verbatim
 shape, inserting this stack's toolchain setup step (daily cron, unchanged
 from baseline). The snippet below starts *after* baseline's own
-`actions/checkout@v4` step — do not repeat that step here, baseline's
+`actions/checkout@<resolved-major>` step — do not repeat that step here, baseline's
 skeleton already has it:
 
 ```yaml
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@<resolved-major>
         with:
           go-version-file: go.mod
       - run: ./bin/security-scan
@@ -360,7 +361,7 @@ On `/dev-playbook update` for a Go repo:
 2. Re-resolve the Go version if the user wants to raise the floor (e.g.
    to pick up a new language feature); otherwise leave `go.mod`'s `go`
    directive untouched.
-3. Propagate any version change across all four
+3. Propagate any version change across all of this stack's
    version-consistency-rule locations, per baseline's propagation table:
    - `go.mod`'s `go` directive
    - `.tool-versions`' `golang` line

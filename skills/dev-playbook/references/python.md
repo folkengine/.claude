@@ -12,8 +12,16 @@ file's Config files / Quality gate / CI sections) → `.okf/` seeding.
    one and grow the other, but `uv init` needs to know which shape to lay
    down now.
    - Library: `uv init --lib --vcs none` — creates a `src/<package>/`
-     layout with a build backend (hatchling) wired up in `pyproject.toml`,
-     so `uv build` produces a real sdist + wheel.
+     layout with a build backend wired up in `pyproject.toml`, so
+     `uv build` produces a real sdist + wheel. Which backend depends on
+     the uv version and is not ours to choose: current uv writes its own
+     in-process `uv_build`; older uv wrote hatchling. Keep whatever the
+     native init produced — the playbook's layering rule is that the
+     opinionated layer must not fight the stack's own init. Note the
+     consequence when uv_build is used: `[build-system].requires` pins
+     `uv_build>=<uv-minor>,<<next-uv-minor>`, coupling the build to uv's
+     minor series, so that pin must be revisited whenever `.tool-versions`
+     bumps uv's minor (see `## Update`).
    - Application: `uv init --app --vcs none` — creates a flat layout (`main.py` at the
      repo root, no build backend). If the app must itself be installable
      or distributed as a package (a CLI tool, a service published to an
@@ -46,10 +54,13 @@ file's Config files / Quality gate / CI sections) → `.okf/` seeding.
    uv python pin <resolved-version>
    ```
 
-   This writes `.python-version` (uv's own resolution file — uv reads this
-   before anything else) — treat it as a fifth thing, alongside
-   `.tool-versions`, that must stay in lockstep with the version-consistency
-   rule below.
+   This writes `.python-version` — uv's own resolution file, which uv reads
+   *before* `.tool-versions` or anything else. **It is a member of this
+   stack's version-consistency set**, the one Python adds beyond baseline's
+   four, bringing this stack's total to five. Because uv consults it first,
+   a `.python-version` that disagrees with the rest doesn't merely sit
+   there being wrong — it silently wins, and every `uv run` in the repo
+   uses an interpreter neither CI nor the devcontainer does.
 3. Write the floor into `pyproject.toml`:
 
    ```toml
@@ -60,11 +71,66 @@ file's Config files / Quality gate / CI sections) → `.okf/` seeding.
    devcontainer image tag, and this `requires-python` value must all agree
    — the version-consistency rule from baseline applies here from the
    first commit onward.
-4. No license-driven config file is needed at Init for Python the way
+4. **Make what `uv init` generated actually pass the gate — it does not
+   out of the box.** This is not optional polish: skip either part below
+   and the scaffold's first `make ayce` is red on code the playbook
+   itself produced.
+
+   **(a) Add docstrings to the generated hello-world.** `uv init --lib`
+   writes exactly this, with no module docstring and no function
+   docstring:
+
+   ```python
+   def hello() -> str:
+       return "Hello from <package>!"
+   ```
+
+   Under `select = ["ALL"]` that is two immediate lint errors — `D104`
+   (missing docstring in public package) and `D103` (missing docstring
+   in public function). Rewrite it to satisfy the documentation bar the
+   `## CLAUDE.md addenda` section imposes: a module docstring saying what
+   the package is for, and a function docstring with a summary line, a
+   `Returns:` section, and a usage example, in whichever convention
+   `[tool.ruff.lint.pydocstyle]` declares.
+
+   **(b) Create `tests/` yourself — `uv init` does not.** Every variant
+   (`--lib`, `--app`, `--app --package`) writes only `src/<pkg>/` (or a
+   flat `main.py`), `pyproject.toml`, `README.md`, and `.python-version`.
+   There is no `tests/` directory. This matters because the `lint` phase
+   and the CI `lint` job both run `uv run mypy src tests`, which fails
+   outright on a missing path. Write:
+
+   - `tests/test_<package>.py` — at least one real test against the
+     hello-world, so `test` and `lint` both exercise actual code from the
+     first commit. Test modules need docstrings too, for the same `D`
+     rules.
+   - **No `tests/__init__.py`.** With the `src/` layout, tests import the
+     package from the installed distribution rather than from the source
+     tree, which is exactly what makes this layout catch packaging
+     mistakes (a module missing from the wheel fails the test run instead
+     of passing on an accidental source-tree import). Adding an
+     `__init__.py` would silence ruff's `INP001` but forfeit that
+     property; the `## Config files` section ignores the rule under
+     `tests/` instead.
+5. Declare the license in `pyproject.toml`. Baseline copies the
+   `LICENSE-*` files to the repo root, but nothing wires them into the
+   package metadata, so `uv build` would otherwise produce a
+   distribution with no license declared. Add, matching whatever the user
+   chose:
+
+   ```toml
+   license = "MIT"
+   license-files = ["LICENSE-MIT"]
+   ```
+
+   For a multi-license scaffold use an SPDX expression and list every
+   file (e.g. `license = "MIT OR Apache-2.0"` with
+   `license-files = ["LICENSE-MIT", "LICENSE-APACHE"]`).
+6. No license-driven *config* file is needed at Init for Python the way
    `deny.toml`'s allow-list is for Rust — this stack's security scanner
    (pip-audit, below) checks for known *vulnerabilities*, not license
-   compliance. Baseline's `LICENSE-*` copy step still runs from whatever
-   the user picks; there's just no second file to keep in sync with it.
+   compliance. The `LICENSE-*` files come from baseline and the manifest
+   metadata from step 5; there's no third file to keep in sync.
 
 ## Toolchain
 
@@ -133,7 +199,20 @@ ignore = [
     "ISC001", # implicit string concatenation — also fights the formatter;
               # ruff's own docs recommend disabling both when using
               # `ruff format`.
+    "CPY001", # per-file copyright headers — the LICENSE-* files at the
+              # repo root are the authoritative grant; duplicating one
+              # atop every source file adds churn without legal effect.
 ]
+
+[tool.ruff.lint.pydocstyle]
+# CLAUDE.md requires one docstring style project-wide; declaring it here is
+# what makes ruff's D rules enforce that choice instead of accepting either.
+convention = "google"   # or "numpy" — pick one at scaffold time
+
+[tool.ruff.lint.per-file-ignores]
+# S101: bare `assert` is the idiomatic pytest form. Still forbidden in src/.
+# INP001: tests/ deliberately has no __init__.py — see `## Init`, step 4.
+"tests/*" = ["S101", "INP001"]
 
 [tool.mypy]
 strict = true
@@ -151,8 +230,21 @@ was left off. Keep the `ignore` list above short and *documented* — every
 entry has a one-line reason in the comment next to it; if the project
 needs more (e.g. `ANN401` for a spot that genuinely needs `Any`), add it
 with the same comment discipline, at the top-level list or as a per-file
-`[tool.ruff.lint.per-file-ignores]` entry (tests commonly want
-`"tests/*" = ["S101"]` to allow bare `assert`).
+`[tool.ruff.lint.per-file-ignores]` entry.
+
+The carve-outs beyond the formatter-conflict pairs — `CPY001`, `S101`,
+`INP001`, and the `pydocstyle` convention — are seeded above rather than
+discovered later because **every one of them fires on the scaffold's own
+hello-world output**. Without them, `## Quality gate`'s first `make ayce`
+is guaranteed red on code the playbook itself generated, and step 6 of
+the skill burns iterations rediscovering the same set every run.
+
+Note what is deliberately *not* on that list: `D103`/`D104`, the missing
+docstrings on `uv init`'s generated `hello()`. Those are fixed at the
+source (`## Init`, step 4a) rather than ignored, because the
+documentation bar in `## CLAUDE.md addenda` is a real project standard —
+silencing the rule to make the scaffold green would mean the very first
+commit violates the standard the repo claims to hold.
 
 Add Python-specific ignores to the shared `.gitignore` (baseline writes
 the file; these are the Python-specific lines — trimmed from
@@ -228,9 +320,11 @@ docs: ## build docs, fail on warnings
 dev-dependency via `uv add --dev mkdocs`.
 
 Notes:
-- `lint`'s second line assumes the `src/` + `tests/` layout that
-  `uv init --lib` (or `--app --package`) produces. If Init chose the flat
-  `uv init --app` layout instead, change it to `uv run mypy .` (mypy
+- `lint`'s second line assumes the `src/` layout from `uv init --lib` (or
+  `--app --package`) **plus the `tests/` directory that `## Init` step 4
+  tells you to create** — `uv init` does not create `tests/` itself, and
+  `mypy src tests` fails outright on the missing path. If Init chose the
+  flat `uv init --app` layout instead, change it to `uv run mypy .` (mypy
   respects `pyproject.toml`'s config either way) and keep this in sync with
   whichever layout Init actually wrote.
 - `test` does not run doctest examples by default. The `## CLAUDE.md
@@ -287,9 +381,11 @@ environment happens to have drifted to.
 ## CI
 
 Generate `.github/workflows/ci.yaml` from baseline's triggers block (push,
-pull_request, monthly cron) with these jobs. Use `astral-sh/setup-uv@v5`
-for toolchain setup in every job; pin `actions/checkout` and
-`astral-sh/setup-uv` to current major versions at scaffold time:
+pull_request, monthly cron) with these jobs. Use `astral-sh/setup-uv@<resolved-major>`
+for toolchain setup in every job. Resolve every `@<resolved-major>` below at
+scaffold time — see baseline.md, § CI workflows → Action version pins, for
+the procedure and the offline fallback table. Never write a major copied from
+this file:
 
 ```yaml
 name: CI
@@ -315,8 +411,8 @@ jobs:
         python-version: ["<resolved-python-version>"]
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@<resolved-major>
+      - uses: astral-sh/setup-uv@<resolved-major>
         with:
           python-version: ${{ matrix.python-version }}
       - run: uv run pytest
@@ -326,8 +422,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@<resolved-major>
+      - uses: astral-sh/setup-uv@<resolved-major>
       - run: uv run ruff check .
       # src/tests matches the src-layout from `uv init --lib` /
       # `--app --package`. For the flat `uv init --app` layout use
@@ -340,8 +436,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@<resolved-major>
+      - uses: astral-sh/setup-uv@<resolved-major>
       - run: uv run ruff format --check .
 ```
 
@@ -355,11 +451,11 @@ oldest one matches `requires-python`'s floor.
 Generate `.github/workflows/security.yaml` per baseline's exact verbatim
 shape, inserting this stack's toolchain setup step (daily cron, unchanged
 from baseline). The snippet below starts *after* baseline's own
-`actions/checkout@v4` step — do not repeat that step here, baseline's
+`actions/checkout` step — do not repeat that step here, baseline's
 skeleton already has it:
 
 ```yaml
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@<resolved-major>
       - run: ./bin/security-scan
 ```
 

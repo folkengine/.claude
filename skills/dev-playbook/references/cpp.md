@@ -481,7 +481,11 @@ pull_request, monthly cron). Matrix over compiler (gcc, clang) on
 `ubuntu-latest` — both build systems get their own job body; keep only the
 block matching the repo's chosen build system, drop the other entirely
 rather than leaving it commented out in the generated file (shown side by
-side here only so this reference covers both):
+side here only so this reference covers both).
+
+Resolve every `@<resolved-major>` below at scaffold time — see baseline.md,
+§ CI workflows → Action version pins, for the procedure and the offline
+fallback table. Never write a major copied from this file.
 
 ```yaml
 name: CI
@@ -507,7 +511,7 @@ jobs:
       CC: ${{ matrix.compiler == 'gcc' && 'gcc' || 'clang' }}
       CXX: ${{ matrix.compiler == 'gcc' && 'g++' || 'clang++' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@<resolved-major>
 
       # CMake:
       - run: sudo apt-get update && sudo apt-get install -y cmake ninja-build clang-tidy clang-format
@@ -527,7 +531,7 @@ jobs:
 ```
 
 `bazel-contrib/setup-bazel` does not publish a floating major-version tag
-the way `actions/checkout@v4` does — as of this task's authoring its
+the way `actions/checkout@<resolved-major>` does — as of this task's authoring its
 releases are all full `0.x.y` semver tags (`0.19.0` newest, confirmed via
 `gh api repos/bazel-contrib/setup-bazel/tags`), so there is no `@v0`/`@v1`
 to pin to. Resolve the current release tag at scaffold time (same
@@ -549,7 +553,7 @@ version-consistency rule as baseline). Notes:
 Generate `.github/workflows/security.yaml` per baseline's exact verbatim
 shape (daily cron, unchanged from baseline), inserting this stack's
 toolchain setup step **after** the checkout step baseline already writes —
-do not repeat `actions/checkout@v4` here:
+do not repeat `actions/checkout@<resolved-major>` here:
 
 ```yaml
       - run: |
@@ -666,7 +670,7 @@ On `/dev-playbook update` for a C++ repo:
    release cadence — if pinning a specific `ubuntu-XX.04` runner instead of
    `ubuntu-latest`, bump that pin here. Bump the devcontainer image tag in
    lockstep (version-consistency rule).
-3. Propagate any build-system-tool version change across all four
+3. Propagate any build-system-tool version change across all of this stack's
    version-consistency-rule locations, per baseline's propagation table:
    - `.tool-versions`' `cmake` or `bazel` line (whichever this repo uses)
    - `ci.yaml`'s toolchain install step

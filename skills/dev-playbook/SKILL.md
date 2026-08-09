@@ -74,11 +74,13 @@ roster. Never read more than one stack file per run.
    explicit go-ahead before touching files (reading git state is allowed;
    changing it is not).
 3. **Resolve targets** — latest stable per tool, overridden by explicit pins.
-4. **Propagate versions** to all four locations: `.tool-versions`, CI matrix,
-   devcontainer toolchain pin (image tag where the family encodes the
-   language version; otherwise the postCreateCommand/feature pin — see
-   baseline.md § Devcontainer), manifest pins. Bump GitHub Actions `uses:`
-   versions too.
+4. **Propagate versions** to every location this stack declares — the
+   baseline set is `.tool-versions`, CI matrix, devcontainer toolchain pin
+   (image tag where the family encodes the language version; otherwise the
+   postCreateCommand/feature pin — see baseline.md § Devcontainer), and
+   manifest pins; the stack file names any it adds (Python adds
+   `.python-version`). Enumerate the set from the stack file rather than
+   assuming a count. Bump GitHub Actions `uses:` versions too.
 5. **Update dependencies** — run the stack file's Update-section commands.
 6. **Drift check** — for each generated file the stack file defines a
    drift probe for (its Update section names them), regenerate what the
@@ -98,7 +100,15 @@ roster. Never read more than one stack file per run.
 - Never run state-changing git commands. Print them for the user.
 - `make ayce` is always the default Makefile target; its meaning never varies.
 - One security-scan definition (`bin/security-scan`); Makefile and CI call it.
-- The four version-declaring locations always agree.
+- Every version-declaring location agrees. The set is stack-dependent — the
+  baseline four plus whatever the stack file adds — so enumerate it per stack
+  and never assert a fixed count.
+- GitHub Actions `uses:` majors are resolved at scaffold time like any other
+  version, never copied from a reference file — stack files write them as
+  `@<resolved-major>` for exactly this reason. Refs that name a thing rather
+  than a version (`dtolnay/rust-toolchain@stable`,
+  `taiki-e/install-action@cargo-audit`) are copied verbatim and never
+  resolved. See baseline.md, § CI workflows → Action version pins.
 - Report failures plainly; never claim a green gate that isn't.
 - Offline or registry unreachable: do what is possible, then list exactly which
   steps (version resolution, dependency fetch, advisory databases) need

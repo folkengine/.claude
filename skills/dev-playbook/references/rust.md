@@ -307,8 +307,16 @@ see `## CI` below.)
 Generate `.github/workflows/ci.yaml` from baseline's triggers block (push,
 pull_request, monthly cron) with these jobs. Use `dtolnay/rust-toolchain`
 for toolchain setup in every job (structure ported from
-`rs_blank/.github/workflows/CI.yaml`); pin `actions/checkout` and
-`dtolnay/rust-toolchain` to current major versions at scaffold time:
+`rs_blank/.github/workflows/CI.yaml`). Resolve every `@<resolved-major>`
+below at scaffold time — see baseline.md, § CI workflows → Action version
+pins, for the procedure and the offline fallback table.
+
+**Do not try to resolve a major for `dtolnay/rust-toolchain`.** It is
+versioned by *branch*: `@stable`, `@master`, and `@miri` name toolchain
+channels, and no `@v1` tag exists — "resolving" it yields a ref that does
+not resolve and a workflow that cannot start. The same holds for
+`taiki-e/install-action@cargo-deny` / `@cargo-audit`, where the ref names
+the tool to install. Copy all of these verbatim.
 
 ```yaml
 name: CI
@@ -336,7 +344,7 @@ jobs:
         rust: [stable, beta, "<resolved-msrv>"]
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@<resolved-major>
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.rust }}
@@ -347,7 +355,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@<resolved-major>
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: stable
@@ -359,7 +367,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@<resolved-major>
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: stable
@@ -371,7 +379,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@<resolved-major>
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: stable
@@ -384,8 +392,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
-      - uses: EmbarkStudios/cargo-deny-action@v2
+      - uses: actions/checkout@<resolved-major>
+      - uses: EmbarkStudios/cargo-deny-action@<resolved-major>
 ```
 
 Replace `"<resolved-msrv>"` in the matrix with the actual MSRV string
@@ -405,7 +413,7 @@ Modernization vs. rs_blank's CI, apply these drops/changes:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@<resolved-major>
       - uses: dtolnay/rust-toolchain@miri
       - run: cargo miri test
   ```
@@ -417,7 +425,7 @@ shape, inserting this stack's toolchain setup step (daily cron, unchanged
 from baseline):
 
 ```yaml
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@<resolved-major>
       - uses: dtolnay/rust-toolchain@stable
       - uses: taiki-e/install-action@cargo-deny
       - uses: taiki-e/install-action@cargo-audit
@@ -522,7 +530,7 @@ On `/dev-playbook update` for a Rust repo:
 2. Re-resolve the MSRV if the user wants to raise the floor (e.g. to pick
    up a new language feature); otherwise leave `rust-version` in
    `Cargo.toml` untouched.
-3. Propagate any version change across all four
+3. Propagate any version change across all of this stack's
    version-consistency-rule locations, per baseline's propagation table:
    - `Cargo.toml`'s `rust-version`
    - `.tool-versions`' `rust <version>` line

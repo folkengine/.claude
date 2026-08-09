@@ -343,10 +343,11 @@ behaves as documented.
 ## CI
 
 Generate `.github/workflows/ci.yaml` from baseline's triggers block (push,
-pull_request, monthly cron) with this job. Use `actions/setup-node@v4` for
-toolchain setup, with a version consistent with `.tool-versions`; pin
-`actions/checkout` and `actions/setup-node` to current major versions at
-scaffold time:
+pull_request, monthly cron) with this job. Use `actions/setup-node@<resolved-major>` for
+toolchain setup, with a version consistent with `.tool-versions`. Resolve
+every `@<resolved-major>` below at scaffold time — see baseline.md, § CI
+workflows → Action version pins, for the procedure and the offline fallback
+table. Never write a major copied from this file:
 
 ```yaml
 name: CI
@@ -372,8 +373,8 @@ jobs:
         node-version: ["<resolved-node-version>"]
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@<resolved-major>
+      - uses: actions/setup-node@<resolved-major>
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
@@ -393,11 +394,11 @@ re-resolving if the lockfile and manifest disagree.
 Generate `.github/workflows/security.yaml` per baseline's exact verbatim
 shape, inserting this stack's toolchain setup step (daily cron, unchanged
 from baseline). The snippet below starts *after* baseline's own
-`actions/checkout@v4` step — do not repeat that step here, baseline's
+`actions/checkout@<resolved-major>` step — do not repeat that step here, baseline's
 skeleton already has it:
 
 ```yaml
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@<resolved-major>
         with:
           node-version-file: .tool-versions
       - run: npm ci
@@ -408,7 +409,7 @@ skeleton already has it:
       - run: ./bin/security-scan
 ```
 
-`actions/setup-node@v4`'s `node-version-file` input accepts a `.tool-versions`
+`actions/setup-node@<resolved-major>`'s `node-version-file` input accepts a `.tool-versions`
 file directly (it looks for the `nodejs` line) — this is what keeps CI's
 Node version from drifting out of the version-consistency rule without a
 second hardcoded value in the workflow.

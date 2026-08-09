@@ -90,10 +90,10 @@ system-wide `gradle`/`mvn` on PATH is exactly what the wrapper exists to
 route around). State this decision plainly if asked: **the wrapper file
 (`gradle/wrapper/gradle-wrapper.properties`'s `distributionUrl`, or
 `.mvn/wrapper/maven-wrapper.properties`'s `distributionUrl`) is the single
-source of truth for the build-tool version** — it is a fifth thing to keep
-in sync only in the sense that its version should track the same upgrade
-cadence as the other four; it is not one of the four version-consistency-
-rule locations itself (JDK is).
+source of truth for the build-tool version** — it is an additional thing to
+keep in sync only in the sense that its version should track the same
+upgrade cadence as the rest; it is **not** a member of this stack's
+version-consistency set, which covers the JDK version, not the build tool.
 
 Other tools in play (not `.tool-versions` lines — see rationale below):
 
@@ -110,7 +110,7 @@ Rationale notes (feed these one-line whys into
 
 - **Temurin** — Eclipse Adoptium's Temurin builds are the most widely
   supported "no vendor lock-in" OpenJDK distribution across CI runners,
-  devcontainer base images, and asdf/mise; `actions/setup-java@v4` and the
+  devcontainer base images, and asdf/mise; `actions/setup-java@<resolved-major>` and the
   asdf `java` plugin both name it as a first-class `distribution`/vendor
   option.
 - **Kotlin DSL over Groovy DSL** (Gradle only) — statically typed, IDE
@@ -393,12 +393,18 @@ injects the key from a repository secret when available.
 ## CI
 
 Generate `.github/workflows/ci.yaml` from baseline's triggers block (push,
-pull_request, monthly cron). One job, using `actions/setup-java@v4` with
+pull_request, monthly cron). One job, using `actions/setup-java@<resolved-major>` with
 `distribution: temurin` and the resolved JDK, ported from both source
 repos' CI shape and modernized (source repos used branch-list triggers and
 no matrix; this collapses to baseline's push/PR/cron shape with a JDK
 matrix for headroom on future multi-version testing even though today it's
-a single entry):
+a single entry).
+
+Resolve every `@<resolved-major>` below at scaffold time — see baseline.md,
+§ CI workflows → Action version pins, for the procedure and the offline
+fallback table. Never write a major copied from this file. Note that
+`gradle/actions/setup-gradle` is versioned by the `gradle/actions`
+repository, so resolve it against that repo, not against a per-action one.
 
 ```yaml
 name: CI
@@ -421,8 +427,8 @@ jobs:
         java: ["<resolved-jdk>"]
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@<resolved-major>
+      - uses: actions/setup-java@<resolved-major>
         with:
           distribution: temurin
           java-version: ${{ matrix.java }}
@@ -431,7 +437,7 @@ jobs:
           # Maven:
           # cache: maven
       # Gradle:
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@<resolved-major>
       - run: ./gradlew build
       - run: ./gradlew spotlessCheck
       - run: ./gradlew javadoc
@@ -449,10 +455,10 @@ covers both).
 Generate `.github/workflows/security.yaml` per baseline's exact verbatim
 shape (daily cron, unchanged from baseline), inserting this stack's
 toolchain setup step **after** the checkout step baseline already writes —
-do not repeat `actions/checkout@v4` here:
+do not repeat `actions/checkout@<resolved-major>` here:
 
 ```yaml
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@<resolved-major>
         with:
           distribution: temurin
           java-version: "<resolved-jdk>"
@@ -531,7 +537,7 @@ On `/dev-playbook update` for a Java repo:
    - **Maven**: `./mvnw versions:use-latest-releases versions:update-properties`
      (both goals from `org.codehaus.mojo:versions-maven-plugin`, confirmed
      present in that plugin's goal list during this task's authoring).
-2. If bumping the JDK, propagate the new version across all four
+2. If bumping the JDK, propagate the new version across all of this stack's
    version-consistency-rule locations, per baseline's propagation table
    (the toolchain/compiler block in the build file *is* this stack's
    manifest-pin location):

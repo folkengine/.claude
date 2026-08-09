@@ -14,13 +14,22 @@ seven phase names and no others: `clean`, `fmt`, `build`, `test`, `lint`,
 `security-scan`, `docs`.
 
 **Version-consistency rule** (state this to the user verbatim whenever you
-touch any of these four locations, and verify all four agree, every time):
+touch any version-declaring location, and re-verify the whole set every time):
 
-> `.tool-versions`, the CI matrix, the devcontainer toolchain pin (the image
-> tag, where that image family's tag encodes the language version —
-> otherwise a `postCreateCommand`/feature version pin instead; see §
-> Devcontainer), and manifest pins (rust-version, requires-python, engines,
-> java toolchain) MUST agree; verify all four whenever any changes.
+> Every location that declares a runtime or tool version MUST agree. The
+> baseline set is: `.tool-versions`, the CI matrix, the devcontainer
+> toolchain pin (the image tag, where that image family's tag encodes the
+> language version — otherwise a `postCreateCommand`/feature version pin
+> instead; see § Devcontainer), and manifest pins (rust-version,
+> requires-python, engines, java toolchain). **A stack may add more**, and
+> the stack file names them — Python adds `.python-version`, which uv reads
+> before anything else. Whenever any one of them changes, re-verify every
+> location in this stack's set.
+
+Never state this rule with a fixed count ("all four"). The set is
+stack-dependent, and a count that is right for one stack silently undercounts
+another — a rule that undercounts its own pins is worse than no rule, because
+the location it omits is exactly the one nobody checks.
 
 Apply layers in this order, after the stack's native init has already run:
 baseline files (this document) → AI files (CLAUDE.md,
@@ -28,9 +37,12 @@ copilot-instructions.md, AI-BOM.md) → stack configs (stack file, Config files 
 `.okf/` seeding (this document, § OKF seeding — always last).
 
 Never hardcode an exact language or tool version anywhere you write from this
-file. The only pins allowed are: GitHub Actions `uses:` pins (e.g. `@v4`),
-cron strings, and `okf_version: "0.1"`. Every runtime/tool version comes from
-the interview or from "current stable" resolved at run time.
+file. The only pins allowed are cron strings and `okf_version: "0.1"`. Every
+runtime/tool version comes from the interview or from "current stable"
+resolved at run time — and that **includes GitHub Actions `uses:` majors**,
+which are resolved exactly like any other version (see § CI workflows, Action
+version pins). Any `@v<N>` appearing in this document or in a stack file is
+illustrative, never authoritative: treat every one as `@<resolved-major>`.
 
 ## § Files every scaffold gets
 
@@ -48,7 +60,6 @@ that contains those placeholders.
 | `README.md` | generated | See § README shape below. |
 | `.gitignore` | generated | Stack-appropriate ignores (stack file names the language-specific patterns) plus always `.idea/` on its own line. |
 | `.editorconfig` | generated | Stack-appropriate indent/charset rules (stack file may add per-extension overrides); always include a `root = true` top block. |
-| `.yamllint` | this file, § .yamllint | Copy the block below verbatim. |
 | `.tool-versions` | generated | See § .tool-versions below. |
 | `Makefile` | this file, § Makefile contract | Copy the skeleton verbatim; stack file fills phase bodies. |
 | `bin/security-scan` | generated | See § bin/ scripts below; `chmod +x`. |
@@ -101,33 +112,26 @@ Generate `README.md` with, in this order:
    rather than duplicating the rationale prose in the README. Do not restate
    the reasoning here even briefly — one sentence of "what", then the link.
 
-## § .yamllint
+## § No YAML linter
 
-Write this file verbatim as `.yamllint` in the repo root (ported unmodified
-from the org's `.baseline/.yamllint`):
+Scaffolds do **not** ship `.yamllint` or `.yamlignore`, and no stack installs
+or runs yamllint. Earlier versions of this playbook wrote a `.yamllint`; it was
+dropped deliberately, so do not reintroduce it.
 
-```yaml
-extends: default
+The reason is the playbook's own arbiter rule: `make ayce` decides whether the
+repo is correct. No stack's `lint` phase or CI job ever invoked yamllint, and
+no `## Toolchain` section installed it, so the config was inert — it sat in
+every scaffold looking like an enforced standard while enforcing nothing. It
+had in fact been broken the whole time (`ignore-from-file` named a
+`.yamlignore` that no step created, so yamllint aborted with
+`FileNotFoundError` rather than linting), and nothing surfaced that, because
+nothing ran it. A config outside the gate has no mechanism keeping it honest.
 
-ignore-from-file: [.gitignore, .yamlignore]
-
-rules:
-  document-start: disable
-  octal-values: enable
-  truthy:
-    allowed-values: ['true', 'false', 'on']  # 'on' for GH action trigger
-  line-length:
-    max: 200
-  indentation:
-    check-multi-line-strings: false
-    indent-sequences: consistent
-  brackets:
-    max-spaces-inside: 1
-    max-spaces-inside-empty: 0
-  braces:
-    max-spaces-inside: 1
-    max-spaces-inside-empty: 0
-```
+If a project later wants its workflows checked, add a real tool to the `lint`
+phase so the gate enforces it — `actionlint` is the better fit for GitHub
+Actions than a generic YAML linter, since it understands workflow schema,
+expression syntax, and `runs-on` labels. Adding an unenforced config file back
+is not the answer.
 
 ## § .tool-versions
 
@@ -137,14 +141,23 @@ the same file). One line per runtime/tool the stack file names in its
 scaffold time (current stable, or the user's explicit pin) — never write a
 version from memory.
 
-State this rule verbatim in `CLAUDE.md` (§ CLAUDE.md skeleton handles the
-placement) and re-verify it on every `/dev-playbook update` run:
+State the version-consistency rule in `CLAUDE.md` (§ CLAUDE.md skeleton
+handles the placement) and re-verify it on every `/dev-playbook update` run.
+In the generated `CLAUDE.md`, do not paste the generic wording — **enumerate
+the concrete locations this repo actually has**, by path, resolved from the
+stack file. The generic rule teaches an agent what kind of thing to look for;
+a concrete list tells it exactly which files to open. For a Python library
+that list is:
 
-> `.tool-versions`, the CI matrix, the devcontainer toolchain pin (the image
-> tag, where that image family's tag encodes the language version —
-> otherwise a `postCreateCommand`/feature version pin instead; see §
-> Devcontainer), and manifest pins (rust-version, requires-python, engines,
-> java toolchain) MUST agree; verify all four whenever any changes.
+> `.tool-versions`, `.python-version`, `pyproject.toml`'s `requires-python`,
+> `.github/workflows/ci.yaml`'s matrix, and
+> `.devcontainer/devcontainer.json`'s image tag MUST agree; whenever any one
+> changes, verify all of them.
+
+Substitute the equivalent paths for other stacks (`Cargo.toml`'s
+`rust-version`, `go.mod`'s `go` directive, `package.json`'s `engines`, the
+Java toolchain block, …). Count the locations for the stack you are actually
+scaffolding; never copy a count from this document.
 
 ## § Makefile contract
 
@@ -216,8 +229,10 @@ Every job must pin tool versions consistent with `.tool-versions` (same
 version-consistency rule as above). Job bodies (checkout, toolchain setup,
 build/test/lint invocation) come entirely from the stack file.
 
-**`.github/workflows/security.yaml`** — write this exact shape verbatim,
-inserting only the stack's toolchain setup step(s) where marked:
+**`.github/workflows/security.yaml`** — write this exact shape, inserting only
+the stack's toolchain setup step(s) where marked. "Exact shape" governs the
+name, triggers, cron, job structure, and step order — it does **not** freeze
+the `uses:` major, which is resolved like every other version (below):
 
 ```yaml
 name: Security
@@ -229,13 +244,68 @@ jobs:
   security-scan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@<resolved-major>
       # <stack toolchain setup steps here>
       - run: ./bin/security-scan
 ```
 
 The security workflow's cron is always daily; the ci.yaml cron is always
 monthly. Do not swap these or make either configurable.
+
+### Action version pins
+
+Resolve the major of every version-pinned `uses:` at scaffold time, the same
+way you resolve a language version — never copy a literal out of this document
+or a stack file. Stack files write these as `@<resolved-major>` precisely so a
+stale literal cannot be copied by accident.
+
+```
+gh api repos/<owner>/<repo>/releases/latest --jq .tag_name
+```
+
+or, without `gh`:
+
+```
+curl -s https://api.github.com/repos/<owner>/<repo>/releases/latest \
+  | python3 -c 'import json,sys; print(json.load(sys.stdin)["tag_name"])'
+```
+
+Take the major from the returned tag (`v7.0.1` → pin `@v7`). Pin the major
+only, never the full patch tag: majors are the moving refs GitHub maintains
+for exactly this purpose, and a patch pin turns every action release into
+manual maintenance.
+
+**Not every `@ref` is a version. These are refs by name and must be copied
+verbatim — resolving them breaks the action:**
+
+| Ref | What it actually selects |
+|---|---|
+| `dtolnay/rust-toolchain@stable` / `@master` / `@miri` | Rust toolchain *channel*. This action is versioned by branch, not by release tag; there is no `@v1`. |
+| `taiki-e/install-action@cargo-deny` / `@cargo-audit` | Which *tool* to install. The ref is a tool name, not a version. |
+
+Before resolving any `@ref`, ask whether it names a version or a thing. If it
+names a thing, leave it alone.
+
+**Offline / registry unreachable.** Fall back to the last-known-good majors
+below, and say plainly in the handoff which pins were not verified. This table
+is the single place in the playbook allowed to carry a stale action version —
+it exists so that eight stack files do not each carry their own.
+
+| Action | Last-known-good major | Verified |
+|---|---|---|
+| `actions/checkout` | `v7` | 2026-08-09 |
+| `actions/setup-go` | `v7` | 2026-08-09 |
+| `actions/setup-node` | `v7` | 2026-08-09 |
+| `actions/setup-java` | `v5` | 2026-08-09 |
+| `actions/cache` | `v6` | 2026-08-09 |
+| `astral-sh/setup-uv` | `v9` | 2026-08-09 |
+| `golangci/golangci-lint-action` | `v9` | 2026-08-09 |
+| `gradle/actions/setup-gradle` | `v6` | 2026-08-09 |
+| `EmbarkStudios/cargo-deny-action` | `v2` | 2026-08-09 |
+| `bazel-contrib/setup-bazel` | `0.19` | 2026-08-09 |
+
+Refresh this table's values and its Verified date whenever a `/dev-playbook
+update` run resolves something newer.
 
 ## § Devcontainer
 
@@ -329,8 +399,9 @@ decisions must exist before you write rationale about them.
 
 ## § Update-flow propagation table
 
-On `/dev-playbook update`, any version bump must land in all four locations.
-Use this table to find where each lives per file type:
+On `/dev-playbook update`, a version bump must land in **every** location the
+stack declares — the baseline set below, plus any the stack file adds. Use
+this table to find where each lives per file type:
 
 | Location | Where the version lives | Who writes it |
 |---|---|---|
@@ -338,7 +409,9 @@ Use this table to find where each lives per file type:
 | CI matrix | `ci.yaml` job matrix / setup-action `version:` inputs | stack file, `## CI` section |
 | Devcontainer toolchain pin | `.devcontainer/devcontainer.json` — `image` field tag IF that family's tags encode the language version; otherwise the `postCreateCommand`/feature `version` option (image tag itself then just tracks a stable base, not the pinned language version) | baseline layer, § Devcontainer |
 | Manifest pins | `rust-version` (Cargo.toml), `requires-python` (pyproject.toml), `engines` (package.json), Java toolchain version (pom.xml/build.gradle*), go.mod `go` directive, etc. | stack file, `## Update` section |
+| *(stack additions)* | e.g. Python's `.python-version` — read by uv before anything else | stack file, `## Init` / `## Update` sections |
 
-Whenever any one of these four changes, re-check all four for agreement
-before declaring the update done — this is the version-consistency rule
-applied mechanically.
+Before declaring the update done, enumerate this stack's full set and re-check
+every entry for agreement — the version-consistency rule applied
+mechanically. Build that list from the stack file, not from a count carried
+over from another stack.

@@ -378,10 +378,11 @@ rather than passing silently.
 ## CI
 
 Generate `.github/workflows/ci.yaml` from baseline's triggers block (push,
-pull_request, monthly cron) with this job. Use `actions/setup-node@v4` for
-toolchain setup, with a version consistent with `.tool-versions`; pin
-`actions/checkout`, `actions/setup-node`, and `actions/cache` to current
-major versions at scaffold time:
+pull_request, monthly cron) with this job. Use `actions/setup-node@<resolved-major>` for
+toolchain setup, with a version consistent with `.tool-versions`. Resolve
+every `@<resolved-major>` below at scaffold time — see baseline.md, § CI
+workflows → Action version pins, for the procedure and the offline fallback
+table. Never write a major copied from this file:
 
 ```yaml
 name: CI
@@ -407,11 +408,11 @@ jobs:
         node-version: ["<resolved-node-version>"]
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@<resolved-major>
+      - uses: actions/setup-node@<resolved-major>
         with:
           node-version: ${{ matrix.node-version }}
-      - uses: actions/cache@v4
+      - uses: actions/cache@<resolved-major>
         with:
           path: |
             ~/.npm
@@ -439,11 +440,11 @@ generated file. Use `npm ci`, not `npm install`, in CI.
 Generate `.github/workflows/security.yaml` per baseline's exact verbatim
 shape, inserting this stack's toolchain setup step (daily cron, unchanged
 from baseline). The snippet below starts *after* baseline's own
-`actions/checkout@v4` step — do not repeat that step here, baseline's
+`actions/checkout@<resolved-major>` step — do not repeat that step here, baseline's
 skeleton already has it:
 
 ```yaml
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@<resolved-major>
         with:
           node-version-file: .tool-versions
       - run: npm ci
@@ -567,7 +568,7 @@ On `/dev-playbook update` for a Next.js repo:
    (Next.js itself may raise its own minimum — Next 16 requires Node 20.9+
    — so check the target Next version's own requirement isn't already ahead
    of the project's current floor); otherwise leave it as-is.
-5. Propagate any version change across all four version-consistency-rule
+5. Propagate any version change across all of this stack's version-consistency-rule
    locations, per baseline's propagation table:
    - `package.json`'s `engines.node` floor (this stack adds this field by
      hand — see `## Config files` — `create-next-app` doesn't write it)

@@ -87,9 +87,11 @@ check for this stack** — a plain Makefile project has no `Cargo.toml`-style
 manifest. The **only** version-bearing artifact is the devcontainer image
 tag (see below) and the implicit compiler version `ubuntu-latest` installs
 via `apt-get` in CI. State this plainly to the user rather than silently
-skipping the rule: there is nothing to cross-check across four locations
-here, only the devcontainer tag; still re-verify it on every
-`/dev-playbook update` run (see `## Update`).
+skipping the rule: this stack's version-consistency set has exactly one
+member, the devcontainer tag, so there is nothing to cross-check against;
+still re-verify it on every `/dev-playbook update` run (see `## Update`).
+This is the low end of the same principle Python sits at the high end of —
+the set is per-stack, which is why the rule is never stated as a count.
 
 Record all of the above (tool → role → one-line why) in
 `.okf/decisions/toolchain.md` during OKF seeding — do not restate this
@@ -388,7 +390,11 @@ version's "nothing found" wording differs, adjust the `grep` pattern.
 Generate `.github/workflows/ci.yaml` from baseline's triggers block (push,
 pull_request, monthly cron). Matrix over compiler (gcc, clang) on
 `ubuntu-latest`, mirroring `cpp.md`'s compiler matrix since the same
-`CC ?= cc` override in the Makefile makes this trivial to drive from CI:
+`CC ?= cc` override in the Makefile makes this trivial to drive from CI.
+
+Resolve every `@<resolved-major>` below at scaffold time — see baseline.md,
+§ CI workflows → Action version pins, for the procedure and the offline
+fallback table. Never write a major copied from this file.
 
 ```yaml
 name: CI
@@ -413,7 +419,7 @@ jobs:
     env:
       CC: ${{ matrix.compiler }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@<resolved-major>
       - run: sudo apt-get update && sudo apt-get install -y libcheck-dev clang-format clang-tidy pkg-config
       - run: make build
       - run: make test
@@ -435,7 +441,7 @@ not versions.
 Generate `.github/workflows/security.yaml` per baseline's exact verbatim
 shape (daily cron, unchanged from baseline), inserting this stack's
 toolchain setup step **after** the checkout step baseline already writes —
-do not repeat `actions/checkout@v4` here:
+do not repeat `actions/checkout@<resolved-major>` here:
 
 ```yaml
       - run: |
