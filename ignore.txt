@@ -7,3 +7,4 @@
 # pukeit will not push these out to ~/.claude/skills.
 
 eli5
+graphify
