@@ -8,7 +8,7 @@ scene mirror the library also mutates (so two write paths clobber each
 other), callback-only completion, forced `GremlinScene` datatypes, an
 opaque `Sound`, and un-gated serde in the public API.
 
-Its `docs/MURATORI_AUDIT.md` is a known-good audit produced by an agent
+Its `docs/REUSABILITY_AUDIT.md` is a known-good audit produced by an agent
 following the skill, against a seeded previous audit — so it demonstrates
 the refresh-in-place conventions too: Δ notes on changed scores and a
 `## Notes (human)` section preserved verbatim.

@@ -15,7 +15,7 @@ places where SIMD lanes, SWAR bit-tricks, MIMD/thread-level data
 parallelism, or an algorithm/data-structure change would pay off, ranks
 them by payoff-per-risk, and writes `PARALLELISM_AUDIT.md` to the repo's
 docs folder. Analysis only — it never applies optimizations. It follows
-the `/muratori` / `/untangle` house pattern: fixed method, anchored
+the `/reusability` / `/untangle` house pattern: fixed method, anchored
 scoring, `file:line` evidence, report refreshed in place.
 
 **Scope decisions (settled in brainstorming):**
@@ -28,7 +28,7 @@ scoring, `file:line` evidence, report refreshed in place.
   ground the ranking. The skill never runs long benchmarks itself unless
   asked; the report's Verification section prescribes before/after runs.
 - **Structure:** `SKILL.md` + `references/pattern-catalog.md` +
-  `references/report-template.md` (the muratori layout — bulky stable
+  `references/report-template.md` (the reusability layout — bulky stable
   content in references, loaded only on invocation).
 
 ## Skill identity
@@ -42,7 +42,7 @@ scoring, `file:line` evidence, report refreshed in place.
   says smimd.
 - **Do NOT trigger for:** implementing an already-identified optimization
   (regular coding), dependency entanglement (`/untangle`), API design
-  (`/muratori`), kernel purity (`/domain-kernel`). Multi-session reworks
+  (`/reusability`), kernel purity (`/domain-kernel`). Multi-session reworks
   discovered by the audit route to `/epic` as recommendations.
 
 ## Modes
@@ -55,7 +55,7 @@ scoring, `file:line` evidence, report refreshed in place.
 Docs-folder detection follows the other house skills (`docs/` or wherever
 design docs live).
 
-**Re-run behavior (muratori pattern):**
+**Re-run behavior (reusability pattern):**
 
 - Regenerate `PARALLELISM_AUDIT.md` in place with a fresh header.
 - Preserve `## Notes (human)` verbatim.

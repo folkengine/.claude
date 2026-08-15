@@ -1,9 +1,9 @@
 ---
-name: muratori
-description: Evaluate a library's public API against Casey Muratori's 2004 "Designing and Evaluating Reusable Components" criteria — the five characteristics (granularity, redundancy, coupling, retention, flow control) scored against fixed anchors, the practical checklist, and a domain-kernel cross-read — written as a standardized, re-runnable audit in the repo's docs folder (MURATORI_AUDIT.md). Use when the user types `/muratori` or `/muratori <target>`, or asks "how reusable is this API", "evaluate this library's API design", "is this API well designed", "will this be painful to integrate", "find the integration discontinuities", "Muratori review", "retained vs immediate mode check", or "does this library invert control" — even if they never say Muratori. Do NOT trigger for kernel-purity assessment alone (that is /domain-kernel Mode A) or dependency entanglement (that is /untangle).
+name: reusability
+description: Evaluate a library's public API against Casey Muratori's 2004 "Designing and Evaluating Reusable Components" criteria — the five characteristics (granularity, redundancy, coupling, retention, flow control) scored against fixed anchors, the practical checklist, and a domain-kernel cross-read — written as a standardized, re-runnable audit in the repo's docs folder (REUSABILITY_AUDIT.md). Use when the user types `/reusability` or `/reusability <target>`, or asks "how reusable is this API", "evaluate this library's API design", "is this API well designed", "will this be painful to integrate", "find the integration discontinuities", "Muratori review", "retained vs immediate mode check", or "does this library invert control" — even if they never say Muratori. Do NOT trigger for kernel-purity assessment alone (that is /domain-kernel Mode A) or dependency entanglement (that is /untangle).
 ---
 
-# /muratori
+# /reusability
 
 Evaluate how a library's public API will behave under real integration
 pressure, using the criteria Casey Muratori distilled from Granny 3D
@@ -34,12 +34,12 @@ in a session.
 
 | Invocation | Does |
 |---|---|
-| `/muratori` | Audit the current repo's primary library → `<docs>/MURATORI_AUDIT.md` |
-| `/muratori <path-or-member>` | Audit a specific crate/package (workspace member or path); one audit file per audited library, next to its docs |
+| `/reusability` | Audit the current repo's primary library → `<docs>/REUSABILITY_AUDIT.md` |
+| `/reusability <path-or-member>` | Audit a specific crate/package (workspace member or path); one audit file per audited library, next to its docs |
 
 Detect the repo's docs folder the way the other house skills do (`docs/` or
 wherever existing design docs live). The audit **refreshes
-`MURATORI_AUDIT.md` in place** — regenerate each run with a fresh header,
+`REUSABILITY_AUDIT.md` in place** — regenerate each run with a fresh header,
 preserve any `## Notes (human)` section verbatim, and when a previous audit
 exists, add a one-line `Δ` note to any characteristic whose score changed.
 
@@ -126,7 +126,7 @@ the report rather than skipping fields.
 
 | Mistake | Fix |
 |---|---|
-| Inventing a report filename per run | Always `MURATORI_AUDIT.md`, refreshed in place — diffability is the point |
+| Inventing a report filename per run | Always `REUSABILITY_AUDIT.md`, refreshed in place — diffability is the point |
 | Defining the 1–5 scale inline | The anchors file is the scale; quote the matched anchor per score |
 | Scoring zero redundancy as 1/5 | Redundancy measures coherence; spartan-but-coherent is a 3 |
 | Averaging into an "overall n/5" | No arithmetic headline; write the discontinuity verdict in prose |

@@ -1,4 +1,4 @@
-# MURATORI_AUDIT.md template
+# REUSABILITY_AUDIT.md template
 
 Every slot marked REQUIRED must be present — an audit without a reuse-kind
 classification, an anchor quote per score, or the usage sketches is not
@@ -7,7 +7,7 @@ verbatim; when a previous audit exists, add a one-line `Δ` note to any
 characteristic whose score changed.
 
 ```markdown
-# Muratori Audit — <library name>
+# Reusability Audit — <library name>
 
 <!-- REQUIRED header block -->
 | | |
@@ -15,7 +15,7 @@ characteristic whose score changed.
 | Subject | <name> <version> — <public surface, one line> |
 | Commit | <short hash> (read-only git) |
 | Date | <YYYY-MM-DD> |
-| Method | Muratori, *Designing and Evaluating Reusable Components* (2004); anchors per the /muratori skill |
+| Method | Muratori, *Designing and Evaluating Reusable Components* (2004); anchors per the /reusability skill |
 | Reuse kind | **layer / engine / component** — <one-sentence justification> (REQUIRED) |
 
 <!-- If reuse kind is engine or layer: one short paragraph on which

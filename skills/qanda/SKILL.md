@@ -1,10 +1,10 @@
 ---
-name: balser
-description: Generate a paired self-test Q&A study set — <TOPIC>_QUESTIONS.md and <TOPIC>_ANSWERS.md in the repo's docs folder — that helps developers learn how the code works by answering questions from the code before checking the answers. Named for a great developer-mentor. Use when the user types /balser or /balser <topic>, or asks for "comprehension questions about this code", "quiz me on the architecture", "Q&A docs to help developers understand the codebase", "study questions for onboarding" — even if they never say balser. Project-agnostic. Do NOT trigger for runnable TDD exercises (that is /codebase-kata) or demo runbooks (that is /presentation).
+name: qanda
+description: Generate a paired self-test Q&A study set — <TOPIC>_QUESTIONS.md and <TOPIC>_ANSWERS.md in the repo's docs folder — that helps developers learn how the code works by answering questions from the code before checking the answers. Use when the user types /qanda or /qanda <topic>, or asks for "comprehension questions about this code", "quiz me on the architecture", "Q&A docs to help developers understand the codebase", "study questions for onboarding" — even if they never say qanda. Project-agnostic. Do NOT trigger for runnable TDD exercises (that is /codebase-kata) or demo runbooks (that is /presentation).
 version: 1.0.0
 ---
 
-# /balser — self-test Q&A study sets
+# /qanda — self-test Q&A study sets
 
 Generate two files that teach a developer one aspect of the current
 codebase: a spoiler-free questions file they attempt first against the
@@ -15,9 +15,9 @@ file without learning any answers from it.
 ## Workflow
 
 1. **Resolve the topic.**
-   - `/balser <topic>` — use the argument (e.g. `architecture`, `flow`,
+   - `/qanda <topic>` — use the argument (e.g. `architecture`, `flow`,
      `error-handling`, `persistence`, or a subsystem name).
-   - Bare `/balser` — survey the codebase (entry points, module layout,
+   - Bare `/qanda` — survey the codebase (entry points, module layout,
      README, docs folder) and propose 3–5 topics chosen from what is
      genuinely non-obvious in THIS repo — not a fixed menu. Let the user
      pick one via AskUserQuestion.

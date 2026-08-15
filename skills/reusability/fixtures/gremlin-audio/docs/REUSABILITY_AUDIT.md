@@ -1,11 +1,11 @@
-# Muratori Audit — gremlin-audio
+# Reusability Audit — gremlin-audio
 
 | | |
 |---|---|
 | Subject | gremlin-audio 0.3.1 — one central `Mixer` (1 constructor + 5 methods), plain-data scene types (`GremlinScene`, `GremlinEmitter`, `GremlinListener`), opaque `Sound`, `GremlinError` |
 | Commit | n/a (not a git repo) |
 | Date | 2026-08-03 |
-| Method | Muratori, *Designing and Evaluating Reusable Components* (2004); anchors per the /muratori skill |
+| Method | Muratori, *Designing and Evaluating Reusable Components* (2004); anchors per the /reusability skill |
 | Reuse kind | **component** — data flows both ways (the caller feeds scene state in, the mixer hands back voice counts and finished-sound ids) and the caller's game loop stays in charge, driving `pump()` each frame. Full five-characteristic scoring applies. |
 
 ## Summary

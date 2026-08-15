@@ -1,10 +1,10 @@
-# ignore.txt — skill names that suckit and pukeit must never sync.
+# ignore.txt — skill names that pull and push must never sync.
 #
 # One skill name per line (must match the directory name under skills/).
 # Blank lines and lines starting with # are ignored.
 #
-# suckit will not pull these in from ~/.claude/skills.
-# pukeit will not push these out to ~/.claude/skills.
+# pull will not pull these in from ~/.claude/skills.
+# push will not push these out to ~/.claude/skills.
 
 eli5
 graphify
