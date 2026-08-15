@@ -23,6 +23,26 @@ dst_skills="$repo_root/skills"
 dst_commands="$repo_root/commands"
 dst_hooks="$repo_root/hooks"
 
+# Skill names that must never be pulled in, one per line, in
+# <repo>/ignore.txt. Blank lines and lines starting with # are ignored.
+ignore_file="$repo_root/ignore.txt"
+ignore_skills=()
+if [[ -f "$ignore_file" ]]; then
+    while IFS= read -r line; do
+        line="${line%%#*}"
+        line="$(echo "$line" | tr -d '[:space:]')"
+        [[ -n "$line" ]] && ignore_skills+=("$line")
+    done < "$ignore_file"
+fi
+
+is_ignored_skill() {
+    local name="$1" ig
+    for ig in "${ignore_skills[@]:-}"; do
+        [[ "$ig" == "$name" ]] && return 0
+    done
+    return 1
+}
+
 added_skills=()
 updated_skills=()
 added_commands=()
@@ -54,6 +74,11 @@ sync_dir() {
     shopt -s nullglob
     for entry in "$src"/*; do
         name="$(basename "$entry")"
+
+        if [[ "$label" == "skill" ]] && is_ignored_skill "$name"; then
+            printf '  x %s: %s (ignored, see ignore.txt)\n' "$label" "$name"
+            continue
+        fi
 
         if [[ -e "$dst/$name" ]]; then
             # diff -rq handles both files and directory trees, ignoring

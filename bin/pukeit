@@ -56,6 +56,26 @@ dst_skills="$HOME/.claude/skills"
 dst_commands="$HOME/.claude/commands"
 dst_hooks="$HOME/.claude/hooks"
 
+# Skill names that must never be pushed out, one per line, in
+# <repo>/ignore.txt. Blank lines and lines starting with # are ignored.
+ignore_file="$repo_root/ignore.txt"
+ignore_skills=()
+if [[ -f "$ignore_file" ]]; then
+    while IFS= read -r line; do
+        line="${line%%#*}"
+        line="$(echo "$line" | tr -d '[:space:]')"
+        [[ -n "$line" ]] && ignore_skills+=("$line")
+    done < "$ignore_file"
+fi
+
+is_ignored_skill() {
+    local name="$1" ig
+    for ig in "${ignore_skills[@]:-}"; do
+        [[ "$ig" == "$name" ]] && return 0
+    done
+    return 1
+}
+
 backup_root="$HOME/.claude/.pukeit-backups/$(date -u +%Y%m%dT%H%M%SZ)"
 state_file="$HOME/.claude/.pukeit-state"
 mkdir -p "$HOME/.claude"
@@ -129,6 +149,12 @@ sync_dir() {
     shopt -s nullglob
     for entry in "$src"/*; do
         name="$(basename "$entry")"
+
+        if [[ "$label" == "skill" ]] && is_ignored_skill "$name"; then
+            printf '  x %s: %s (ignored, see ignore.txt)\n' "$label" "$name"
+            continue
+        fi
+
         key="$label/$name"
         h_repo="$(hash_of "$entry")"
 
