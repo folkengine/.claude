@@ -51,3 +51,56 @@ The verdict's "more actionable than the canonical published writing" claim was c
 `invariants.md` supplies all three missing things: per-invariant detection tactics, hard-vs-cosmetic grading, and a lint + CI + sandbox enforcement path — that concreteness is the basis of the comparison (even though, per the charge sheet, the shipped implementations of those checks are buggy).
 
 Not compared: Gary Bernhardt's *Functional Core, Imperative Shell* (2012) is a paywalled screencast; only its landing page is public, so no honest text comparison was possible.
+
+---
+
+# Addendum: critique of the name "domain kernel"
+
+> Produced by `/critique` on 2026-08-18. Target: the **term itself**, not the
+> skill. Sources read: `SKILL.md`, `references/charter.md`,
+> `references/hexagonal-comparison.md`, `assets/kernel-purity.yml`,
+> `scripts/check_purity.py`. Line counts and the prior-art claim were checked,
+> not eyeballed; the search results below were run on 2026-08-18.
+
+## Verdict
+
+"Domain kernel" is a decent name wearing one big flaw. Both words are borrowed, and both point the reader somewhere else. The worst problem: in almost all of computing, a **kernel is the one part that is allowed to do I/O** — files, network, devices, privilege. This pattern's rule #1 (`SKILL.md:22-24`) is **no I/O at all**. The name's loudest meaning says the opposite of the pattern's loudest rule. That is why the docs must spend 147 lines telling readers what the thing is not, versus 14 lines saying what it is.
+
+## Charge sheet
+
+**FATAL — "kernel" means "the I/O part"; this pattern means "the no-I/O part".** `SKILL.md:22-24` mandates "no filesystem, network, clock, randomness, or environment access of its own." Compare the everyday meanings of *kernel*: OS kernel (owns devices and syscalls), Jupyter kernel (a live process that runs code), CUDA/GPU kernel (a function launched on a device), microkernel (still owns IPC and scheduling — and `charter.md:31-35` concedes microkernel is "the closest structural neighbor"). Every one of those is an *effect-doing* thing. Consequence: any reader who has not yet read the charter forms the inverted model on first contact, and the name must be undone before it can be used.
+
+**SERIOUS — the name carries the two borrowed legs and drops the new one.** `charter.md:12-17` states the entire reason the term exists: the third leg — a language-neutral boundary where purity is enforced by the runtime ("purity-as-physics"). Neither "domain" nor "kernel" says pure, portable, or sandboxed. Both words name the part shared with the prior art. The name markets the unoriginal two-thirds.
+
+**SERIOUS — the name needs a bodyguard of disclaimers.** Verified line counts: `references/hexagonal-comparison.md` is 122 lines, and `hexagonal-comparison.md:116-119` states it exists because "without an explicit entry they will collapse 'domain kernel' into 'hexagonal with new branding.'" Add `charter.md:22-46`, a 25-line defense against five look-alikes. That is ~147 lines of *not-that* against 14 lines of definition (`SKILL.md:21-34`). A name needing a ten-to-one defense is losing the argument before it starts.
+
+**SERIOUS — the search space is fully occupied even though the exact phrase is not.** `charter.md:24` claims "The term is mostly unclaimed." Verified by search on 2026-08-18: querying `"domain kernel" software architecture pattern` returns DDD **Shared Kernel**, Core Domain, and **microkernel** — precisely the three neighbors the charter must fight — and nothing resembling this pattern. Querying outside software returns ML kernel methods and domain adaptation. The phrase is unclaimed the way an empty seat in a packed row is unclaimed. A reader who hears the term and looks it up lands on the wrong pattern, not on nothing.
+
+**MINOR — the skill's own filenames vote for a different word.** The enforcement artifacts are named after *purity*, not *kernel*: `scripts/check_purity.py`, `assets/kernel-purity.yml`, and the job `Assert pure dependency tree is I/O-free` (`kernel-purity.yml:31`). When the tooling keeps reaching for "pure," that is the word doing the real work.
+
+**MINOR — "domain" is DDD-loaded in both directions.** To a DDD reader, "domain" + "kernel" parses as a compound of two DDD terms, so the first guess is Shared Kernel. To a non-DDD reader, "domain" is either meaningless or means DNS.
+
+## What survives
+
+"Kernel" gets three things right: small, central, and *must not break* — and the pattern genuinely mandates a narrow boundary (`SKILL.md:31-34`; Mode C flags over-broad kernels). The term composes well in real use: "kernel purity," "kernel-shaped," "domain-kernel charter," and it is applied consistently across the toolbox (`skills/epic/references/methodology.md:12,43`). Two words, sayable, and no one owns the exact phrase in architecture. Do not discard it on style grounds.
+
+## Fix order
+
+1. **Decide: keep or rename** (see below).
+2. **If keeping:** add one sentence to `SKILL.md` directly under the definition that kills the OS-kernel read head-on — e.g. *"Unlike an OS kernel, this kernel has no privileges: it is the one part that may not touch the outside world."* That single line does more work than the 147 defensive lines and permits shrinking them.
+3. **Lead every definition with purity.** `SKILL.md:21` currently reads "one domain's logic, isolated." Make it "one domain's *pure* logic." The word doing the work should land before the word causing the confusion.
+4. **Correct `charter.md:24`.** "Mostly unclaimed" is misleading. State that the exact phrase is free but the search results are owned by Shared Kernel and microkernel — which is *why* the positioning section exists.
+
+## The decision
+
+- **Option A — keep "domain kernel", add the anti-OS-kernel sentence.** Cheap. The term already spans 6 skills and the README. Keeps the brand and patches its worst read.
+- **Option B — rename to "pure domain core"** (or "sealed domain core"). States the invariant out loud, collides with no OS/GPU/Jupyter meaning, and matches what the tooling is already called. Cost: renaming a skill, a slash command, a charter template, and cross-references in 6 other skills.
+
+**Recommendation: A.** The flaw is real but it is a *first-contact* flaw, and one sentence fixes first contact. B buys clarity obtainable for one line and charges a full-toolbox rename for it.
+
+## Sources checked
+
+- [Shared Kernel Pattern in Domain-Driven Design](https://mehmetozkaya.medium.com/shared-kernel-pattern-in-domain-driven-design-ddd-21cba2a9f92a)
+- [An Overview Of MicroKernel Architecture Pattern](https://www.c-sharpcorner.com/article/an-overview-of-microkernel-architecture-pattern/)
+- [Open Group: DDD Strategic Patterns](https://pubs.opengroup.org/architecture/o-aa-standard/DDD-strategic-patterns.html)
+- [An introduction to domain adaptation and transfer learning](https://arxiv.org/pdf/1812.11806)
