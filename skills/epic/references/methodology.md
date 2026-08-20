@@ -25,6 +25,35 @@ you decide that you know everything… that's the true moment you have truly
 failed."* The recurring metaphor: **your code is the hero; your tests tell the
 hero's journey.**
 
+## Demo on demand (core value)
+
+Tests prove the code to a machine. A **demo proves it to a human.** The house rule:
+*any slice of work must be demonstrable on demand* — a stakeholder says "show me",
+and within minutes they get something tactile, from a fresh clone, with no bespoke
+setup and without the author in the room.
+
+This is a **definition-of-done clause, not a nicety.** An EPIC with green tests and
+no runnable demo is not finished. Consequences that follow from taking it
+seriously:
+
+- **Design the demo first.** Write the `## Demo on Demand` section while the code
+  is still imaginary. A slice you cannot describe demoing is a slice whose value
+  you cannot describe either — that is a scoping signal, so re-cut the slice.
+- **The demo is a committed artifact**, not an improvised terminal session:
+  `examples/<name>.rs`, a CLI subcommand, a `just`/`make` target, or a test whose
+  stdout *is* the demo. It lives in the repo, runs in CI where possible, and rots
+  loudly rather than silently.
+- **It gets a Status row and a Work Item.** Same honesty rules as any other
+  component: `Planned` until it runs at a named commit.
+- **Tactile beats comprehensive.** Sixty seconds of visible behavior beats a
+  ten-minute tour. Show the domain doing its job, not the framework booting.
+- **No observable surface?** Say so in one line and name the nearest proxy — a
+  golden-output test that prints, a benchmark table, a debug dump. The section is
+  never deleted, only answered.
+
+The `/presentation` skill consumes this section to produce a live demo runbook;
+`## Demo on Demand` is the durable source it reads.
+
 ## An EPIC *is* a domain kata
 
 The methodology grows from the [EverCraft Kata](https://github.com/PuttingTheDnDInTDD/EverCraft-Kata),
@@ -100,5 +129,6 @@ cross-repo effort.
 
 Cite `path/file.rs:line` for every factual claim. A checked box or a `Complete`
 row must be backed by code that proves it, pinned to a named commit and date.
+A demo described in the present tense must actually run at that commit.
 State what the EPIC does **not** do. For evaluations, run the checks and report the
 real output — failures, skips, and all.

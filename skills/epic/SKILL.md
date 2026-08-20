@@ -9,7 +9,9 @@ Write an **EPIC** — a durable design document that frames one bounded slice of
 domain as a *kata*: identify the Things, encode the Business Requirements as
 Business Logic, and drive it out test-first. An EPIC states the **what and why**
 (context, goals, design, verification); its Work Items carry the **how** as
-numbered, phase-grouped tasks. This skill produces that document, and its
+numbered, phase-grouped tasks. Every EPIC also carries a **Demo on Demand**
+section: the committed, runnable artifact that lets a stakeholder ask "show me"
+and get a tactile answer in minutes. No demo, no done. This skill produces that document, and its
 companion forms, in the house style used across the user's `pkcore` / `pkdealer`
 repos and adapted in `cardpack.rs`.
 
@@ -82,14 +84,24 @@ Never renumber or rename an existing EPIC.
    **Business Logic** (the code that enforces them). Scope one bounded slice — an
    EPIC is a kata, not the whole product.
 
-5. **Write the document.** Copy `references/epic-template.md` as the skeleton and
+5. **Design the Demo on Demand.** Before drafting, decide how a stakeholder will
+   *see* this slice working: the artifact (runnable example, CLI subcommand,
+   `just`/`make` target, a test whose stdout is the demo, screencast script), the
+   exact commands, and what the observer will see on screen. Prefer the repo's
+   existing demo idiom over inventing one — check `examples/`, `justfile`,
+   `Makefile`, `scripts/`, and any `docs/demos/`. The demo artifact is a
+   deliverable of the EPIC, so it gets its own Work Item and its own Status row.
+   Companion skill: `/presentation` turns a shipped EPIC into a live runbook — the
+   Demo on Demand section is what makes that possible.
+
+6. **Write the document.** Copy `references/epic-template.md` as the skeleton and
    fill every section, deleting the guidance comments and any section that
    genuinely does not apply (say why in one line rather than leaving it blank).
    For a progress/evaluation doc, use `references/progress-template.md` instead.
    Match the repo's own tone and, if it has existing EPICs, their exact heading
    conventions.
 
-6. **Verify honesty before finishing.** Status-table rows and any checkboxes must
+7. **Verify honesty before finishing.** Status-table rows and any checkboxes must
    reflect work that has *actually landed*, pinned to a named commit/branch, as of
    a stated date — never aspiration. Re-read the doc: if a box is checked or a row
    says Complete, the cited code must prove it.
@@ -119,7 +131,11 @@ The canonical EPIC section order (full skeleton in `references/epic-template.md`
 13. `## Dependencies` — **Blocks / Built on / Related**, naming other `EPIC-NN`s.
 14. `## Verification` — a fenced ```bash block of exact commands + numbered exit
     criteria.
-15. `## Implementation corrigendum` — *added after shipping*: numbered
+15. `## Demo on Demand` — **required.** The committed demo artifact, its audience,
+    the copy-pasteable runbook, what the observer sees, the **pass signal** (how a
+    stranger knows it worked), the target duration, and the recorded-output
+    fallback. Part of the definition of done.
+16. `## Implementation corrigendum` — *added after shipping*: numbered
     design-vs-actual deltas + a Phase-status-summary table + inherited-debt note.
 
 ## Variants & naming
@@ -144,8 +160,10 @@ An EPIC is a **domain kata**: pick a bounded slice of the domain, model its Thin
 encode its Requirements as Business Logic, and drive it out in tight test-first
 loops. Domain first — the seed before the flower. Your code is the hero; your
 tests tell the hero's journey. CI is a license to be fallible, not a vanity
-metric: a real behavioral change should make a previously-passing test fail.
-Full statement and quotes in `references/methodology.md`.
+metric: a real behavioral change should make a previously-passing test fail. And
+the work is not done until it can be **demoed on demand** — tests prove the code
+to a machine, a demo proves it to a human. Full statement and quotes in
+`references/methodology.md`.
 
 ## Honesty rules
 
@@ -155,5 +173,8 @@ Full statement and quotes in `references/methodology.md`.
   a green box or a `Complete` row.
 - Say what an EPIC does **not** cover; name the deferrals and the out-of-scope
   debt explicitly.
+- The Demo on Demand runbook must actually run at the cited commit. Run it, or say
+  plainly that it is not yet built and leave the Status row `Planned`. Never
+  describe an aspirational demo in the present tense.
 - For evaluations, run the checks and report real output — including failures and
   skips — rather than inferring.
