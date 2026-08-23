@@ -54,22 +54,6 @@
 
 <!-- Concretely, what a consumer can do right now. Cite path:line. -->
 
-## Demo on demand
-
-<!-- Did you RUN the parent EPIC's `## Demo on Demand` runbook, on a clean
-     checkout, at the evaluated commit? Report the real result. A demo that no
-     longer runs is a finding, not a footnote. If the EPIC never defined a demo,
-     say so and recommend one. -->
-
-| Item | Result |
-|---|---|
-| Demo artifact exists (`<path>`) | ✅ / ❌ |
-| Runbook executes clean from fresh clone | ✅ / ❌ <error> |
-| Wall-clock duration | <Ns> |
-| Recorded fallback current (`docs/demos/<name>.txt`) | ✅ / ⚠️ stale |
-
-**What a stakeholder sees today:** <one honest paragraph, or "nothing yet".>
-
 ## Quality evaluation
 
 **Strengths**

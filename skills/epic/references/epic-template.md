@@ -30,7 +30,6 @@
 |---|---|
 | <new type / module / behavior> | Planned |
 | <…> | Planned |
-| **Demo on demand** (`<demo command>`) | Planned |
 
 <!-- Cell vocabulary: Planned · **Complete** · **Deferred** · 🔒 Gated (design only)
      · Pending release tag. Emoji (✅ / 🟡 / ◻️) is fine if the repo's EPICs use it. -->
@@ -82,8 +81,7 @@
 
 <!-- The "how", as numbered tasks grouped into phases. Phase 0 = prerequisites /
      feature-gating / scaffolding; middle phases = one module or type each with its
-     tests; final phase = docs/roadmap AND the Demo on Demand artifact. Each item
-     is self-contained, cites its
+     tests; final phase = docs/roadmap. Each item is self-contained, cites its
      path:line target, names the test to add, and ends with the green-check command.
      Use `- [ ]`; track completion by flipping the Status table, not by checking
      boxes (the cardpack adaptation does check `- [x]` — follow the host repo). -->
@@ -97,14 +95,6 @@
 
 - [ ] **1.** <task + the exact test to add>
 - [ ] **2.** Unit tests: <named tests and what they assert>
-
-### Phase N — Demo & docs
-
-- [ ] **Na.** Build the demo artifact named in `## Demo on Demand`
-      (`examples/<name>.rs` / `<runner> demo-<name>`) and commit it with the code.
-- [ ] **Nb.** Run the demo runbook on a clean checkout; paste the real output into
-      `docs/demos/<name>.txt` as the recorded fallback.
-- [ ] **Nc.** Update README / ROADMAP to point at the demo command.
 
 ---
 
@@ -147,53 +137,6 @@ Exit criteria:
 1. <observable, testable outcome>
 2. <no-regression guarantee for existing behavior>
 3. <downstream consumers unaffected / release audit clean>
-4. The `## Demo on Demand` runbook below runs clean on a fresh clone, at HEAD,
-   with no manual setup beyond the documented commands.
-
----
-
-## Demo on Demand
-
-<!-- REQUIRED SECTION — part of the definition of done. An EPIC is not finished
-     until any stakeholder can say "show me" and get a tactile demonstration within
-     minutes, from a fresh clone, with no bespoke setup and no author present.
-     Write this section at DESIGN time, before the code exists, so the demo shapes
-     the work rather than being retrofitted onto it. The demo artifact is a
-     committed deliverable, not an improvised terminal session.
-     If the slice genuinely has no observable surface, say so in ONE line and name
-     the nearest observable proxy (a golden-output test that prints, a benchmark
-     table, a debug dump) — do not delete this section. -->
-
-**Demo artifact:** `examples/<name>.rs` — committed alongside the code.
-<!-- Pick the cheapest thing that is still tactile: a runnable example, a CLI
-     subcommand, a `just`/`make` target, a test whose stdout IS the demo, a short
-     screencast script. Prefer something already in the repo's demo idiom. -->
-
-**Audience:** <who asks to see this — product owner, downstream repo owner, new
-contributor — and what they care about.>
-
-**Runbook** — exact commands, copy-pasteable, no editing required:
-
-```bash
-cargo run --features <feats> --example <name>
-```
-
-**What the observer sees:** <the concrete tactile outcome — the dealt hand
-printed, the illegal bet rejected with this message, the timing table. Describe it
-specifically enough that you could diff this paragraph against real output.>
-
-**Pass signal:** <REQUIRED. The one thing an observer with no knowledge of the
-codebase checks to know the demo succeeded — "exits 0 and block 2 prints three
-results instead of a panic", "the final line reads WINNER: Seat 3". A demo whose
-success only an author can judge is not a demo.>
-
-**Duration:** <target wall-clock, e.g. under 60 seconds.>
-
-**Recorded fallback:** `docs/demos/<name>.txt` — real captured output, refreshed
-whenever the demo changes; used when live execution is not possible.
-
-<!-- Honesty: this section describes a demo that RUNS at the cited commit. Never
-     describe an aspirational demo as if it exists. -->
 
 ---
 
