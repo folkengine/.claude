@@ -76,8 +76,13 @@ Mechanical and low-risk; verify it touches no external call site first:
 1. Add a small format-agnostic error the kernel owns:
    ```rust
    #[derive(Debug)]
-   pub struct CodecError(Box<dyn std::error::Error + 'static>);
-   impl CodecError { pub fn new(e: impl std::error::Error + 'static) -> Self { Self(Box::new(e)) } }
+   pub struct CodecError(Box<dyn std::error::Error + Send + Sync + 'static>);
+   impl CodecError {
+       pub fn new(e: impl std::error::Error + Send + Sync + 'static) -> Self { Self(Box::new(e)) }
+   }
+   // `Send + Sync` is not optional: without it the error cannot cross a
+   // thread, feed `anyhow`, or be returned from an async fn — which defeats
+   // the point of a kernel meant to back services.
    // + Display and Error (source) impls
    ```
 2. Change public signatures `-> Result<T, serde_yaml::Error>` to

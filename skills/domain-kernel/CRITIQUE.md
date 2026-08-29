@@ -54,6 +54,60 @@ Not compared: Gary Bernhardt's *Functional Core, Imperative Shell* (2012) is a p
 
 ---
 
+## Resolution — 2026-08-28
+
+Fix order items 1–4 applied. Verified by `scripts/test_check_purity.py` (14 tests,
+one per finding; each watched fail before the fix) and by re-running the checker
+against the repro crate from this document — previously **0 findings, exit 0**,
+now **6 HARD findings, exit 1**.
+
+- **FATAL (ban list)** — fixed. `BANNED_CRATES` now covers the common format
+  crates (`serde_json`, `bincode`, `toml`, `ron`, `csv`, CBOR/MessagePack…),
+  runtimes, transport, storage, randomness (`rand`, `getrandom`, `fastrand`) and
+  CLI parsers, and is declared the single source of truth the other three gates
+  copy. `deny-bans.toml` and `kernel-purity.yml` synced. SKILL.md now states
+  plainly that a clean report means "none of the known shapes", not "pure".
+- **SERIOUS (`#[cfg(test)]` suppression)** — fixed. Replaced the one-way
+  `in_test_mod` boolean with brace-depth tracking, so suppression ends with the
+  module. Reads the comment-stripped line, so a comment mentioning the attribute
+  no longer switches it on. Both directions covered by tests.
+- **SERIOUS (nested generics)** — fixed. Dropped the `Result<[^>]*` regex for a
+  buffered public-signature scan that spans multi-line signatures and matches a
+  banned path anywhere in a `pub fn`/`struct`/`enum`/`trait` signature, plus
+  fields and variant payloads inside a public type body.
+- **SERIOUS (exit contract)** — fixed. Direct I/O, non-determinism and `Path` in
+  a public signature are now HARD, so a crate violating invariant #1 exits 1.
+  The docstring states the severity contract explicitly.
+- **SERIOUS (pure-by-default untested)** — fixed. `kernel-purity.yml` gained a
+  `cargo tree` assertion on the DEFAULT tree ahead of the `--no-default-features`
+  one, and its cargo-deny step now runs `--all-features`.
+- **SERIOUS (deny-bans false claim)** — fixed. Replaced with the verified
+  behaviour: a feature-gated optional dep passes a plain `cargo deny check bans`;
+  use `--all-features` to surface it.
+- **MINOR** — `CodecError` is now `Box<dyn Error + Send + Sync + 'static>` in both
+  docs; `clippy.toml` carries a workspace blast-radius warning and per-crate
+  invocation; the `jco` parenthetical matches its command; SKILL.md's checker path
+  is no longer cwd-relative; the ECC comparison is marked author context.
+
+**Naming — decided 2026-08-28: Option A, keep "domain kernel".** Addendum fix
+order items 2-4 applied:
+
+- `SKILL.md` now opens "one domain's *pure* logic" — the word doing the work
+  lands before the word causing the confusion.
+- A "Not an OS kernel" callout sits directly under the four-point definition,
+  stating that this kernel has no privileges and is the one part that may *not*
+  touch the outside world. First contact is where the name misleads; that is
+  where the correction now is.
+- `charter.md` no longer claims the term is "mostly unclaimed". It states the
+  verified position: the exact phrase is free, but the search results around it
+  are owned by Shared Kernel, Core Domain and microkernel — which is why the
+  positioning section exists.
+
+The 147 defensive lines in `hexagonal-comparison.md` and `charter.md` were left
+in place; the callout permits shrinking them later but nothing there is wrong.
+
+---
+
 # Addendum: critique of the name "domain kernel"
 
 > Produced by `/critique` on 2026-08-18. Target: the **term itself**, not the

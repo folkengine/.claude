@@ -1,8 +1,10 @@
 # Kernel-purity CI. Drop in .github/workflows/ (or merge the `purity` job into an
 # existing workflow). This is the *testable definition* of a domain kernel: the
-# pure build compiles, and no banned crate is in its dependency tree.
+# crate is pure BY DEFAULT (invariant #3), the pure build compiles, and no banned
+# crate is in either tree.
 #
-# Adjust BANNED to match deny-bans.toml. For separate repos that each host a
+# Keep BANNED in sync with BANNED_CRATES in scripts/check_purity.py (the single
+# source of truth) and with deny-bans.toml. For separate repos that each host a
 # kernel, lift this into the org's `.github` repo as a reusable workflow and call
 # it with `uses:` from each kernel.
 
@@ -13,8 +15,8 @@ on:
   pull_request:
 
 env:
-  # Pipe-separated crate names that must be ABSENT from the pure dependency tree.
-  BANNED: "serde_yaml|serde_yaml_bw|tokio|reqwest|hyper|tonic|axum|rusqlite|sqlx"
+  # Pipe-separated crate names that must be ABSENT from the kernel's tree.
+  BANNED: "serde_json|serde_yaml|serde_yaml_bw|serde_cbor|ciborium|bincode|postcard|rmp|rmp-serde|toml|ron|csv|quick-xml|tokio|async-std|smol|reqwest|hyper|ureq|tonic|axum|actix-web|warp|rocket|rusqlite|sqlx|diesel|sled|redb|rand|getrandom|fastrand|clap|structopt"
 
 jobs:
   purity:
@@ -27,7 +29,20 @@ jobs:
       # 1. The pure kernel must compile with no default features.
       - run: cargo check --no-default-features --lib --tests
 
-      # 2. No banned (I/O / format / transport) crate may be in the pure tree.
+      # 2. Invariant #3 — pure BY DEFAULT. A bare `cargo add` of this crate must
+      #    yield the kernel, so the DEFAULT tree must also be clean. Without this
+      #    step, `default = ["serialization"]` sails through the check below.
+      - name: Assert the default dependency tree is I/O-free
+        run: |
+          if cargo tree --edges normal --prefix none \
+               | sort -u | grep -E "^($BANNED) " ; then
+            echo "::error::banned crate present in the DEFAULT build — a kernel must be pure by default (set default = [] and move convenience behind an opt-in feature)"
+            exit 1
+          fi
+          echo "default dependency tree is clean"
+
+      # 3. And the explicitly-pure tree, which must stay clean even if step 2 is
+      #    relaxed for a crate that ships a deliberate non-empty default.
       - name: Assert pure dependency tree is I/O-free
         run: |
           if cargo tree --no-default-features --edges normal --prefix none \
@@ -36,6 +51,17 @@ jobs:
             exit 1
           fi
           echo "pure kernel dependency tree is clean"
+
+      # 4. The heuristic source-level checks (public-signature leaks, direct
+      #    I/O). Only runs if you vendored check_purity.py into this repo; copy
+      #    it from the domain-kernel skill to enable.
+      - name: Static purity check
+        run: |
+          if [ -f scripts/check_purity.py ]; then
+            python3 scripts/check_purity.py .
+          else
+            echo "scripts/check_purity.py not vendored — skipping source-level check"
+          fi
 
   lints:
     name: Kernel lints (clippy + deny bans)
@@ -48,4 +74,6 @@ jobs:
       - run: cargo clippy --all-targets -- -D warnings
       - uses: EmbarkStudios/cargo-deny-action@v2
         with:
-          command: check bans
+          # `--all-features` so optional, feature-gated banned deps are surfaced
+          # too; cargo-deny is feature-aware and ignores them otherwise.
+          command: check bans --all-features

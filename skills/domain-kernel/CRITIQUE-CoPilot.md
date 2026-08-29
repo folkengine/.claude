@@ -48,3 +48,27 @@ This is a valuable architecture skill with an untrustworthy enforcement implemen
 Approval status
 Not approved for production use as an enforcement skill.
 Conditional approval only for conceptual guidance and architecture education, pending enforcement repair.
+
+
+---
+
+## Resolution — 2026-08-28
+
+All six findings confirmed against the source, and all six were already recorded
+in `CRITIQUE.md` (2026-08-18), which additionally found four the memo missed —
+including a false factual claim in `assets/deny-bans.toml` about cargo-deny's
+feature awareness. This memo is corroboration, not new information.
+
+Findings 1–5 are fixed and covered by `scripts/test_check_purity.py`; see the
+Resolution section of `CRITIQUE.md` for the per-finding detail and verification.
+
+Finding 6 (naming) is addressed without a rename. The name "domain kernel" is
+kept deliberately — it is load-bearing across six skills and the README, and the
+flaw is a first-contact one. `SKILL.md` now leads with "one domain's *pure*
+logic" and carries a "Not an OS kernel" callout under the definition, stating
+that this kernel has no privileges and is the one part that may not touch the
+outside world. `charter.md`'s misleading "mostly unclaimed" claim is corrected.
+
+All five of the memo's stated conditions for approval as an enforcement skill are
+met: checker correctness, default-build purity in CI, removal of the suppressed
+false negatives, direct I/O as a hard failure, and corrected naming language.

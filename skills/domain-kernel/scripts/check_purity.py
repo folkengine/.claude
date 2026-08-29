@@ -2,15 +2,24 @@
 """Static domain-kernel purity checker.
 
 Flags the most common kernel-purity violations in a Rust crate WITHOUT needing a
-Rust toolchain: default features that pull I/O/format crates, format-crate types
-in public signatures, paths in public signatures, and direct I/O in non-test
-code. Heuristic by design — a grep, not a compiler — so review findings rather
-than trusting them blindly. Test modules can still produce false positives.
+Rust toolchain: default features that pull I/O/format crates, banned crate types
+in public signatures, paths in public signatures, and direct I/O or
+non-determinism in non-test code. Heuristic by design — a grep, not a compiler —
+so review findings rather than trusting them blindly.
 
 Usage:
-    python check_purity.py <path-to-crate-root>
+    python3 check_purity.py <path-to-crate-root>
 
-Exit code: 0 if no HARD findings, 1 otherwise (so CI can gate on it).
+Severity contract:
+    HARD  a documented invariant violation. Exit code 1. Gate CI on this.
+    WARN  needs a human read; does not change the exit code.
+
+`BANNED_CRATES` below is the single source of truth for the crate list. The three
+other gates this skill ships (`assets/clippy.toml`, `assets/deny-bans.toml`,
+`assets/kernel-purity.yml`) carry their own copies — keep them in sync, and
+extend all four for crates specific to your stack.
+
+Tests: `python3 scripts/test_check_purity.py`.
 """
 
 from __future__ import annotations
@@ -19,14 +28,38 @@ import re
 import sys
 from pathlib import Path
 
-# Concrete format crates (the `serde` trait itself is fine), runtimes, transport,
-# storage. The `serde` derive trait is intentionally absent.
+# Crates that must not reach the pure kernel. The `serde` *trait* crate is
+# deliberately absent — deriving is fine; a concrete format is not.
 BANNED_CRATES = [
-    "serde_yaml", "serde_yaml_bw", "tokio", "async_std", "async-std",
-    "reqwest", "hyper", "tonic", "axum", "rusqlite", "sqlx",
+    # concrete serialization formats
+    "serde_json", "serde_yaml", "serde_yaml_bw", "serde_cbor", "ciborium",
+    "bincode", "postcard", "rmp", "rmp_serde", "toml", "ron", "csv",
+    "quick_xml", "serde_xml_rs", "plist",
+    # async runtimes
+    "tokio", "async_std", "smol",
+    # transport / server / client
+    "reqwest", "hyper", "ureq", "tonic", "axum", "actix_web", "warp", "rocket",
+    # storage
+    "rusqlite", "sqlx", "diesel", "sled", "redb",
+    # non-determinism (a kernel takes an injected seed, it does not source one)
+    "rand", "getrandom", "fastrand", "oorandom",
+    # delivery concerns
+    "clap", "structopt",
 ]
 
 HARD, WARN = "HARD", "WARN"
+
+
+def _aliases(name: str) -> set[str]:
+    """Cargo lets `-` and `_` alias each other; compare on both spellings."""
+    return {name, name.replace("-", "_"), name.replace("_", "-")}
+
+
+BANNED_LOOKUP = {a for c in BANNED_CRATES for a in _aliases(c)}
+
+
+def is_banned(name: str) -> bool:
+    return bool(_aliases(name) & BANNED_LOOKUP)
 
 
 def parse_cargo(cargo: Path):
@@ -71,17 +104,16 @@ def cargo_findings(cargo: Path):
 
     # Non-optional banned deps are ALWAYS in the graph -> hard.
     for name, optional in deps.items():
-        base = name.replace("-", "_")
-        if base in BANNED_CRATES or name in BANNED_CRATES:
-            if not optional:
-                out.append((HARD, "Cargo.toml",
-                            f"banned crate '{name}' is a non-optional dependency "
-                            f"(make it `optional = true` behind a feature)"))
+        if is_banned(name) and not optional:
+            out.append((HARD, "Cargo.toml",
+                        f"banned crate '{name}' is a non-optional dependency "
+                        f"(make it `optional = true` behind a feature, or inject "
+                        f"the capability it provides at the seam)"))
 
-    # Default features that turn the convenience stack on.
+    # Default features that turn the convenience stack on (invariant #3).
     default = feats.get("default", [])
     if default:
-        # Resolve which banned optional deps `default` reaches (one level + dep:).
+        # Resolve which banned optional deps `default` reaches.
         reachable = set()
 
         def walk(feat, seen=None):
@@ -98,8 +130,7 @@ def cargo_findings(cargo: Path):
                     reachable.add(item.split("/")[0])
         for f in default:
             walk(f)
-        hit = sorted(d for d in reachable
-                     if d in BANNED_CRATES or d.replace("-", "_") in BANNED_CRATES)
+        hit = sorted(d for d in reachable if is_banned(d))
         if hit:
             out.append((HARD, "Cargo.toml",
                         f"default features enable banned crate(s) {hit} — a kernel "
@@ -112,14 +143,104 @@ def cargo_findings(cargo: Path):
     return out
 
 
-PUB_PATH = re.compile(r"\bpub\s+fn\b.*\b(Path|PathBuf)\b")
-PUB_FMT_ERR = re.compile(
-    r"->\s*Result<[^>]*\b(" + "|".join(re.escape(c) for c in BANNED_CRATES) + r")::Error")
-VARIANT_FMT_ERR = re.compile(
-    r"\((" + "|".join(re.escape(c) for c in BANNED_CRATES) + r")::Error\)")
+_CRATE_ALT = "|".join(sorted({re.escape(a) for a in BANNED_LOOKUP if "-" not in a},
+                             key=len, reverse=True))
+
+# A banned crate named as a path anywhere (`serde_json::Value`, `tokio::spawn`).
+BANNED_PATH = re.compile(r"\b(" + _CRATE_ALT + r")::")
+# The start of a public item whose signature callers must compile against.
+PUB_ITEM = re.compile(r"\bpub(\s*\([^)]*\))?\s+(fn|struct|enum|type|trait|const|static)\b")
+PUB_TYPE_BLOCK = re.compile(r"\bpub(\s*\([^)]*\))?\s+(struct|enum|trait)\b")
+PUB_PATH = re.compile(r"\b(Path|PathBuf)\b")
 DIRECT_IO = re.compile(
-    r"\bstd::fs::|\bstd::net::|\bstd::env::var|\bstd::process::Command|"
-    r"\bSystemTime::now\b|\breqwest::|\btokio::|\bhyper::")
+    r"\bstd::fs::|\bstd::net::|\bstd::env::(var|vars)\b|\bstd::process::Command|"
+    r"\bSystemTime::now\b|\bInstant::now\b|\b(Utc|Local)::now\b|"
+    r"\bthread_rng\s*\(|\bOsRng\b|\bgetrandom\b|"
+    r"\breqwest::|\btokio::|\bhyper::|\brand::")
+
+
+def _scan_file(f: Path):
+    """Walk one file, tracking brace depth so `#[cfg(test)]` suppression ends
+    with its module, and buffering multi-line public signatures."""
+    out = []
+    depth = 0
+    suppress_until = None     # depth the enclosing #[cfg(test)] block started at
+    pending_cfg_test = False  # saw the attribute, waiting for the item it marks
+    pub_type_until = None     # depth a `pub struct`/`pub enum` body started at
+    sig_start = None          # line number a buffered public signature began on
+    sig_text = ""
+
+    for i, raw in enumerate(
+            f.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
+        code = raw.split("//", 1)[0]
+        delta = code.count("{") - code.count("}")
+        loc = f"{f}:{i}"
+
+        # --- #[cfg(test)] scoping -------------------------------------------
+        # Read the comment-stripped line, so a comment mentioning the attribute
+        # cannot switch suppression on.
+        if suppress_until is None and "#[cfg(test)]" in code:
+            pending_cfg_test = True
+            depth += delta
+            continue
+        if pending_cfg_test:
+            if "{" in code:
+                suppress_until = depth   # cleared when depth returns here
+                pending_cfg_test = False
+            elif ";" in code:
+                pending_cfg_test = False  # annotated a single item, not a block
+            depth += delta
+            continue
+        if suppress_until is not None:
+            depth += delta
+            if depth <= suppress_until:
+                suppress_until = None
+            continue
+
+        # --- public signature leaks (invariant #2) ---------------------------
+        if sig_start is not None:
+            sig_text += " " + code.strip()
+        elif PUB_ITEM.search(code):
+            sig_start, sig_text = i, code.strip()
+
+        if sig_start is not None and ("{" in code or ";" in code):
+            sig_loc = f"{f}:{sig_start}"
+            hit = BANNED_PATH.search(sig_text)
+            if hit:
+                out.append((HARD, sig_loc,
+                            f"'{hit.group(1)}' named in a public signature — every "
+                            f"caller now compiles against it (use an opaque kernel "
+                            f"type; convert at the seam)"))
+            if PUB_PATH.search(sig_text):
+                out.append((HARD, sig_loc,
+                            "path in a public signature — that is I/O policy in the "
+                            "kernel (take bytes/&str; let an adapter own the "
+                            "filesystem)"))
+            if PUB_TYPE_BLOCK.search(sig_text) and "{" in code:
+                pub_type_until = depth
+            sig_start, sig_text = None, ""
+
+        # --- leaks in public struct fields / enum variant payloads -----------
+        if pub_type_until is not None:
+            hit = BANNED_PATH.search(code)
+            if hit:
+                out.append((HARD, loc,
+                            f"'{hit.group(1)}' in a public field or variant payload "
+                            f"(box it behind an opaque kernel error)"))
+
+        # --- direct I/O and non-determinism (invariant #1) -------------------
+        hit = DIRECT_IO.search(code)
+        if hit:
+            out.append((HARD, loc,
+                        f"direct I/O / non-determinism in non-test code "
+                        f"('{hit.group(0)}') — move it to an adapter; inject time, "
+                        f"randomness and the filesystem"))
+
+        depth += delta
+        if pub_type_until is not None and depth <= pub_type_until:
+            pub_type_until = None
+
+    return out
 
 
 def source_findings(src: Path):
@@ -128,21 +249,7 @@ def source_findings(src: Path):
         parts = set(f.parts)
         if "tests" in parts or "benches" in parts or "examples" in parts:
             continue
-        in_test_mod = False
-        for i, line in enumerate(f.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
-            code = line.split("//", 1)[0]
-            if "#[cfg(test)]" in line:
-                in_test_mod = True  # crude: suppress the immediately following block
-            loc = f"{f}:{i}"
-            if PUB_FMT_ERR.search(code) or VARIANT_FMT_ERR.search(code):
-                out.append((HARD, loc, "format crate named in a public signature "
-                                       "(use an opaque kernel error; convert at the seam)"))
-            if PUB_PATH.search(code):
-                out.append((WARN, loc, "path in a public fn signature "
-                                       "(take bytes/&str; let an adapter own the filesystem)"))
-            if DIRECT_IO.search(code) and not in_test_mod:
-                out.append((WARN, loc, "direct I/O / non-determinism in non-test code "
-                                       "(move to an adapter; inject time/randomness)"))
+        out.extend(_scan_file(f))
     return out
 
 
@@ -164,7 +271,7 @@ def main():
     print(f"\nDomain-kernel purity report for {root}\n" + "=" * 52)
     if not findings:
         print("No purity violations detected. (Still run the build-level checks: "
-              "`cargo check --no-default-features` and the cargo tree assertion.)")
+              "`cargo check --no-default-features` and the cargo tree assertions.)")
         sys.exit(0)
 
     for sev, label, items in (("HARD (fix first)", HARD, hard), ("WARN (review)", WARN, warn)):

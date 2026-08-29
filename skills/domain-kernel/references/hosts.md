@@ -48,7 +48,7 @@ PYTHONPATH=py_bindings componentize-py -d wit -w <domain> componentize app -o ke
 
 ```bash
 npm install @bytecodealliance/jco @bytecodealliance/preview2-shim
-npx jco transpile kernel.wasm -o gen        # (omit --no-nodejs-compat for Node)
+npx jco transpile kernel.wasm -o gen --no-nodejs-compat   # drop the flag for Node
 node run.mjs                                 # import { kernel } from "./gen/<name>.js"
 ```
 

@@ -18,7 +18,7 @@ description: >-
 
 # Domain Kernel
 
-A **domain kernel** is one domain's logic, isolated so it is:
+A **domain kernel** is one domain's *pure* logic, isolated so it is:
 
 1. **Pure** — every operation is a total function from state and input to new
    state and emitted events; no filesystem, network, clock, randomness, or
@@ -30,6 +30,12 @@ A **domain kernel** is one domain's logic, isolated so it is:
 4. **Narrow-boundaried** — exposed through a small, stable interface, ideally a
    language-neutral one so the kernel can be implemented in one language and
    driven from another.
+
+> **Not an OS kernel.** In most of computing a kernel is the privileged part —
+> the one component *allowed* to touch files, devices and the network. This is
+> the opposite: a domain kernel has no privileges, and is the one part that may
+> not touch the outside world at all. Read "kernel" here as *small, central,
+> must not break* — never as *privileged*.
 
 Naming a component a kernel is both a description and a *constraint*: it commits
 the code to staying pure and small, and that commitment is what makes the
@@ -63,11 +69,19 @@ or read the real source first** — the value is in file:line evidence.
 
 1. Run the deterministic checker against the crate root:
    ```bash
-   python scripts/check_purity.py <path-to-crate>
+   python3 "$CLAUDE_SKILL_DIR/scripts/check_purity.py" <path-to-crate>
+   # $CLAUDE_SKILL_DIR is this skill's directory; use its absolute path if unset.
    ```
-   It flags: default features that pull I/O/format crates, format-crate types in
-   public signatures, and direct `std::fs`/`std::net`/`std::env`/`tokio`/`reqwest`
-   use in non-test code. It needs only Python — no Rust toolchain.
+   It flags, as HARD findings (exit code 1, so CI can gate on it): default
+   features that pull I/O/format crates, banned-crate types in public
+   signatures, paths in public signatures, and direct I/O or non-determinism
+   in non-test code. It needs only Python — no Rust toolchain.
+
+   It is a grep, not a compiler: its `BANNED_CRATES` list is the single source
+   of truth the three other gates copy, and it covers the common ecosystem, not
+   every crate. **Extend the list for the stack under review** and treat a clean
+   report as "none of the known shapes", not "pure". Its own behaviour is
+   covered by `scripts/test_check_purity.py` (`python3` that file to run it).
 2. Read `references/invariants.md` and check the crate against each invariant by
    hand for the things a grep can't catch (e.g. a method that *takes a path* vs.
    one that takes bytes; hidden-info projection present or not).

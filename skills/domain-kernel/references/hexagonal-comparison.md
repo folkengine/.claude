@@ -1,5 +1,11 @@
 # Domain Kernel vs. Hexagonal Architecture
 
+> **Note on the ECC comparison below:** the `hexagonal-architecture`
+> skill it is compared against is an external artifact that is not
+> present in this repo. Treat that section as author context, not as
+> something a reader can verify from here; the rest of this document
+> stands on published sources.
+
 An addendum for Mode D (and for anyone who reaches for this skill already knowing
 hexagonal architecture). Hexagonal is the closest ancestor — the charter's
 synthesis line names it, and `charter.md`'s neighbor list points here for the

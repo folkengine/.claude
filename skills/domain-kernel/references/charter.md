@@ -21,7 +21,11 @@ State that synthesis up front, or the piece has no reason to exist.
 
 ## Position against the crowded neighbors
 
-The term is mostly unclaimed but sits among look-alikes; differentiate each:
+The exact phrase is free, but the search space around it is fully occupied:
+looking up "domain kernel" returns DDD Shared Kernel, Core Domain and
+microkernel — the very neighbors below. A reader who hears the term and
+searches lands on the wrong pattern, not on nothing. That is *why* this
+positioning section exists; differentiate each:
 
 - **DDD Shared Kernel** — a subset of a domain *model* two bounded contexts agree
   to co-own. About sharing between teams; a domain kernel is a whole domain's

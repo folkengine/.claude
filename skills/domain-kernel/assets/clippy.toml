@@ -1,5 +1,12 @@
-# Kernel purity lints. Drop at the crate (or workspace) root and run:
-#   cargo clippy --all-targets -- -D warnings
+# Kernel purity lints. Drop at the KERNEL CRATE root and run:
+#   cargo clippy -p <kernel-crate> --all-targets -- -D warnings
+#
+# WORKSPACE WARNING: clippy reads one clippy.toml per invocation, resolved
+# from the workspace root. Placing this file at a workspace root applies these
+# bans to every member — including the adapter crates whose whole job is to
+# own `Path`, `std::fs` and the runtime — and `-D warnings` then fails their
+# build. In a workspace, either keep the kernel in its own workspace, or drop
+# these bans and rely on cargo-deny plus check_purity.py, which are per-crate.
 #
 # These ban the entry points a pure domain kernel must not use. Trim entries the
 # kernel legitimately needs and add crate-specific offenders. Banning a *type*

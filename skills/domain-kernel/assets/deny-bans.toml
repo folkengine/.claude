@@ -1,13 +1,15 @@
 # cargo-deny [bans] fragment for a domain kernel. Merge into the crate's
 # deny.toml (create one with `cargo deny init` if absent), then:
-#   cargo deny check bans
+#   cargo deny check bans --all-features
 #
-# These crates must not appear in the kernel's DEFAULT dependency graph. Keep
-# them as `optional = true` feature dependencies so convenience builds can pull
-# them, but a bare `cargo build` (pure kernel) stays free of them.
+# These crates must not appear in the kernel's dependency graph. Keep them as
+# `optional = true` feature dependencies so convenience builds can pull them,
+# but a bare `cargo build` (pure kernel) stays free of them.
 #
-# Adjust the list to the ecosystem. The principle: format crates, async runtimes,
-# transport/RPC, and storage engines are adapter concerns, not kernel concerns.
+# Keep this list in sync with BANNED_CRATES in scripts/check_purity.py (the
+# single source of truth) and with kernel-purity.yml. Adjust to the ecosystem.
+# The principle: format crates, async runtimes, transport/RPC, storage engines,
+# randomness sources, and CLI parsers are adapter concerns, not kernel concerns.
 
 [bans]
 multiple-versions = "allow"   # set to your project's policy
@@ -15,22 +17,53 @@ wildcards = "deny"
 
 deny = [
     # Concrete serialization FORMATS (the `serde` trait itself is fine):
+    { name = "serde_json" },
     { name = "serde_yaml" },
     { name = "serde_yaml_bw" },
+    { name = "serde_cbor" },
+    { name = "ciborium" },
+    { name = "bincode" },
+    { name = "postcard" },
+    { name = "rmp-serde" },
+    { name = "toml" },
+    { name = "ron" },
+    { name = "csv" },
+    { name = "quick-xml" },
     # Async runtimes:
     { name = "tokio" },
     { name = "async-std" },
+    { name = "smol" },
     # Transport / RPC / HTTP:
     { name = "reqwest" },
     { name = "hyper" },
+    { name = "ureq" },
     { name = "tonic" },
     { name = "axum" },
+    { name = "actix-web" },
+    { name = "warp" },
+    { name = "rocket" },
     # Storage engines:
     { name = "rusqlite" },
     { name = "sqlx" },
+    { name = "diesel" },
+    { name = "sled" },
+    { name = "redb" },
+    # Non-determinism (a kernel takes an injected seed; it does not source one):
+    { name = "rand" },
+    { name = "getrandom" },
+    { name = "fastrand" },
+    # Delivery concerns:
+    { name = "clap" },
+    { name = "structopt" },
 ]
 
-# If any of these are legitimately needed behind an opt-in feature, cargo-deny
-# will still flag them in a default build — which is exactly the signal you want.
-# Verify the pure graph directly too:
-#   cargo tree --no-default-features | grep -E "serde_yaml|tokio|reqwest|rusqlite"  # expect: nothing
+# NOTE on feature-gated deps: cargo-deny is feature-aware. A banned crate behind
+# a non-default `optional = true` feature does NOT appear in a plain
+# `cargo deny check bans` run — that check reports `bans ok`. Run
+# `cargo deny check bans --all-features` when you want those surfaced, and be
+# clear about which question a green run answered.
+#
+# Verify the two trees directly as well — the default one is the one that proves
+# invariant #3 (pure by default):
+#   cargo tree                        | grep -E "serde_json|tokio|reqwest|rand"  # expect: nothing
+#   cargo tree --no-default-features  | grep -E "serde_json|tokio|reqwest|rand"  # expect: nothing

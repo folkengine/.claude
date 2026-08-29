@@ -18,7 +18,8 @@ environment access.
 - Hardcoded path opinions (e.g. `std::fs::write("generated/…")`) — the kernel is
   asserting a CWD layout.
 
-**Detection.** `scripts/check_purity.py` greps for these. Also read every public
+**Detection.** `scripts/check_purity.py` greps for these (HARD findings; it
+has its own test suite in `scripts/test_check_purity.py`). Also read every public
 `fn` signature for `Path`/`PathBuf`. A pure conversion (`to_yaml(&self) -> String`)
 is fine; a persisting one (`save(&self, run: &str)` that writes a file) is not.
 
@@ -36,7 +37,10 @@ crates must never appear in a public signature.
 - **Cosmetic:** a variant *named* `Yaml` whose payload is already opaque
   (`Yaml(Box<dyn Error>)`). Lower priority — a later rename, not a coupling.
 
-**Fix.** Introduce an opaque error (`struct CodecError(Box<dyn Error + 'static>)`)
+**Fix.** Introduce an opaque error
+(`struct CodecError(Box<dyn Error + Send + Sync + 'static>)` — the
+`Send + Sync` matters; without it the error cannot cross a thread or feed
+`anyhow`)
 the kernel owns; convert at the seam (`.map_err(CodecError::new)`). The one place
 the format type may legitimately appear is a `From<FormatError>` impl that boxes
 it — that is the adapter seam, not a leak.
