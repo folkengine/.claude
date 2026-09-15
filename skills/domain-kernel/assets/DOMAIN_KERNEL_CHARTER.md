@@ -4,6 +4,10 @@
 as a language-neutral interface and its purity enforced by the runtime it ships
 in.*
 
+**In plain words:** one domain's rules (DDD: *bounded context*), shipped on
+their own as a shared, versioned contract (DDD: *published language*) — with
+no storage, no I/O, and only values crossing the boundary.
+
 > Template — replace bracketed parts; keep the structure. See
 > `references/charter.md` for the rationale behind each section.
 
@@ -38,8 +42,8 @@ implementable in any language.
 
 ## Positioning
 
-- vs **DDD Shared Kernel** — that shares a model subset between bounded contexts;
-  this isolates a whole domain behind a portable boundary.
+- vs **DDD Shared Kernel** — that shares a model subset between two teams' domain
+  areas; this isolates a whole domain behind a portable boundary.
 - vs **DDD Core Domain** — that is a strategic value designation; this is a
   structural purity/boundary one.
 - vs **Microkernel architecture** — closest structurally; we add the purity
@@ -50,6 +54,13 @@ implementable in any language.
 <list the adapters: the gRPC service, the web frontend, the persistence layer,
 the CLI — these wrap the kernel and own all I/O.>
 
+## What the kernel does not do
+
+Scaling, uptime, fault tolerance and deployment belong to <name the shells
+and services>, not to the kernel. The kernel keeps <domain>'s rules in one
+place and makes them testable. Its help with scale is indirect: we can
+re-cut services without touching the domain.
+
 ## Honest limits
 
 - Naming is adjacent to Shared Kernel / Core Domain — we lead with the synthesis.
@@ -57,6 +68,14 @@ the CLI — these wrap the kernel and own all I/O.>
   lacks threading, so parallel compute stays host-side. (Verify current status.)
 - Any cross-domain shared trait stays thin: state, action, apply, event,
   projection.
+
+## Where this loses
+
+<Name at least one real case in this project where the kernel costs more
+than it saves. For example: a rule that changes every week, so every change
+ripples through the contract; a decision that needs human judgment and can
+only enter the kernel as an input; a consumer that needs a scaling story the
+kernel cannot give.>
 
 ## One-line definition
 
