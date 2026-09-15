@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+# update — rename stale-named skill directories in ~/.claude/skills, and the
+# push/pull state files, to match renames made in this repo.
+#
+# push adds and updates but never deletes, so after a skill is renamed here
+# (e.g. boner -> blooper), a plain push leaves the old ~/.claude/skills/boner
+# sitting next to the new ~/.claude/skills/blooper. Run this once on any
+# other computer that already has the old names, then run push.
+#
+# Usage: update
+
+set -euo pipefail
+
+dst_skills="$HOME/.claude/skills"
+state_file="$HOME/.claude/.push-state"
+
+# Old push/pull state-file names, retired when bin/pukeit and bin/suckit
+# were renamed to bin/push and bin/pull. One old:new pair per line.
+file_renames="
+$HOME/.claude/.pukeit-state:$HOME/.claude/.push-state
+$HOME/.claude/.pukeit-backups:$HOME/.claude/.push-backups
+"
+
+while IFS=: read -r old new; do
+    [[ -z "$old" ]] && continue
+    if [[ -e "$old" && ! -e "$new" ]]; then
+        mv "$old" "$new"
+        printf '  > %s -> %s\n' "$old" "$new"
+    fi
+done <<< "$file_renames"
+
+# old-name:new-name pairs, one per line. Add a line here every time a skill
+# is renamed in this repo.
+renames="
+boner:blooper
+balser:qanda
+muratori:reusability
+"
+
+renamed=0
+skipped=0
+
+while IFS=: read -r old new; do
+    [[ -z "$old" ]] && continue
+    old_path="$dst_skills/$old"
+    new_path="$dst_skills/$new"
+
+    if [[ ! -e "$old_path" ]]; then
+        continue
+    fi
+
+    if [[ -e "$new_path" ]]; then
+        printf '  ! %s -> %s: both exist, leaving untouched (remove one by hand)\n' "$old" "$new"
+        skipped=$((skipped + 1))
+        continue
+    fi
+
+    mv "$old_path" "$new_path"
+    renamed=$((renamed + 1))
+    printf '  > %s -> %s\n' "$old" "$new"
+
+    # Carry the push/pull baseline forward under the new key, so a later
+    # push sees this as an unchanged entry instead of a brand-new one.
+    if [[ -f "$state_file" ]]; then
+        sed -i.bak "s|^skill/${old} |skill/${new} |" "$state_file"
+        rm -f "${state_file}.bak"
+    fi
+done <<< "$renames"
+
+printf '\n---\n'
+printf '%d skill(s) renamed, %d skipped.\n' "$renamed" "$skipped"
+if (( renamed > 0 )); then
+    printf 'Run push next to pick up any content changes for the renamed skills.\n'
+fi
