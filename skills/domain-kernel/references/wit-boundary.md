@@ -34,6 +34,31 @@ State goes *in* and *out* of every call: the component is stateless, the host
 holds the state. That is exactly the pure-kernel model, and it is why a no-import
 component works.
 
+## Version the package, always
+
+Put the version in the package name: `package <org>:<domain>@x.y.z;`. The
+contract is what other stacks depend on, so they need a version they can pin
+and a written change policy: what counts as breaking, how long an old
+version lives, and who decides. Use `assets/CONTRACT_POLICY.md` as the
+template.
+
+## Opaque bytes: state yes, payloads no
+
+A typed contract is strict on purpose. A field that carries untyped data
+brings back the ambiguity the types removed. Tell the cases apart:
+
+- **Fine — opaque state.** `type state = list<u8>;` — made and read only
+  by the kernel, passed back unchanged by the host. The host never looks
+  inside, so no meaning leaks out of the contract. (This is plain bytes, not a
+  WIT `resource`.)
+- **Fine — raw wire input to a protocol kernel.** A kernel whose job is to
+  parse a protocol message takes the bytes as *input* (`message:
+  list<u8>`). Parsing them is the kernel's work, not a hidden agreement.
+- **Not fine — an opaque payload field.** `metadata: string`, `extra:
+  list<u8>`, or a JSON string inside a record. Consumers must agree on what
+  it means outside the contract, so the contract no longer says what the
+  kernel does. Model the structure in WIT instead.
+
 ## Type mapping (Rust → WIT) and the pitfalls
 
 | Rust | WIT | Pitfall |

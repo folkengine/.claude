@@ -2,6 +2,7 @@
 
 Use this when assessing (Mode A) or deciding what to enforce (Mode B). Each
 invariant has a definition, the failure mode, and how to spot it in real code.
+Borrowed terms are defined in plain words in `glossary.md`.
 
 ## 1. Pure — no I/O of its own
 
@@ -80,6 +81,67 @@ themselves (a leak of the entitlement rule out of the kernel)?
 **Definition.** The surface is small and a change to internals does not ripple to
 callers. A transition surface (`to_act` / `legal_actions` / `apply` / `view_for` /
 `outcome`) is the ideal shape; it is also what maps cleanly to a WIT world.
+
+## 7. Things that must change together live in one kernel
+
+**Definition.** One `apply` is the only all-or-nothing step the pattern
+offers. So anything that must change all-or-nothing belongs in one kernel
+(DDD: *consistency boundary*). A change that spans two kernels cannot be
+all-or-nothing. Model it as explicit in-between states that the kernels
+already know — `held`, `awaiting-capture`, `awaiting-settlement` — and let
+the shell move each kernel through them.
+
+**The intra-kernel question.** One kernel can hold several natural groups of
+data that change together — several accounts in a ledger, several hands in a
+tournament. Does one `apply` change the whole state at once, or only one
+group, with the others catching up later? Both answers are fine. Pick one on
+purpose and record it in the kernel's decision record
+(`assets/KERNEL_ADR.md`). Vernon's rules (*Implementing Domain-Driven Design*,
+2013) for sizing a cluster of data that changes together (DDD: *aggregate*)
+are the best guide.
+
+**Failure mode.** A shell updates two kernels and assumes both succeed or
+both fail — for example, "post to the ledger and update the exposure limit
+together" — with no in-between state to land in when one of them fails.
+
+**Detection.** Ask: "Name an operation that must never half-happen. Do its
+writes cross a kernel boundary?" If they do, either the two parts belong in
+one kernel, or the domain needs explicit in-between states. Crossing *with*
+in-between states is fine. Crossing *without* them is a hard finding.
+
+## 8. State belongs to the kernel that changes it
+
+**Definition.** Every piece of state has exactly one owner: the kernel whose
+`apply` changes it. Other kernels and consumers get a projection
+(`view_for`) — never a direct read of the owner's state, and never a shared
+copy they can write.
+
+**When two domains claim the same data.** *Software Architecture: The Hard
+Parts* (ch. 9) gives four answers. The kernel's version of each:
+
+| The book's answer | Plain meaning | Kernel answer |
+|---|---|---|
+| one owner, others ask (Hard Parts: *delegate*) | One side owns the data; the other asks it | **Default.** The owner kernel changes it; the other gets a projection. |
+| split the data (Hard Parts: *table split*) | Each side takes the part it changes | Split the kernel along the same line. |
+| merge the owners (Hard Parts: *service consolidation*) | Put both sides in one unit | **Resist.** This is how a god-kernel grows — one kernel covering more than one domain. |
+| a schema both sides write (Hard Parts: *data domain*) | Both sides share one set of tables | **Refuse.** It is DDD's Shared Kernel in database form. |
+
+**Failure mode.** Two kernels — or a kernel and a service — both write the
+same state. Or a consumer reads full state and filters it itself (see
+invariant 5).
+
+**Detection.** For each state field, ask: which kernel's `apply` changes it?
+No answer, or two answers, is a finding. Classify a shared-data finding by
+its row in the table above.
+
+## Events: inside the contract vs. on the wire
+
+The `event` values a kernel emits are facts in the domain's own words
+(DDD: *domain event*). They stay inside the kernel's contract. A message sent to
+another system in a shared wire format (DDD: *integration event*) is made by
+a shell or a translator from those events — never by the kernel. If a
+kernel's event type carries a wire format, a topic name, or another system's
+field names, a delivery concern has leaked in (invariant 4).
 
 ---
 
