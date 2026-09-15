@@ -45,6 +45,12 @@ boundary trustworthy. The job of this skill is to make that constraint
 The canonical invariants and how to detect violations live in
 `references/invariants.md` — read it before assessing or enforcing.
 
+Terms borrowed from Domain-Driven Design and *Software Architecture: The Hard
+Parts* are defined in plain words in `references/glossary.md`. In anything
+you write, lead with plain words and give the borrowed term once, in
+brackets — "one domain's rules (DDD: *bounded context*)" — so readers who
+know neither source can follow.
+
 ## Pick the mode(s)
 
 Most requests map to one or more of these four phases. Do only what's asked;
@@ -137,10 +143,14 @@ structurally — a component cannot touch I/O it is not granted.
    mapping pitfalls (`usize → u32`, `list<u8> → bytes`, `result<T,E>` is signalled
    by raise/throw, Rust enum-with-payload → WIT `variant`). Full recipe in
    `references/wit-boundary.md`.
-3. **Validate without a Rust toolchain** by generating bindings:
+3. **Version it and state the change policy.** Put the version in the package
+   name (`org:pkg@x.y.z`) and ship a change policy from
+   `assets/CONTRACT_POLICY.md`. Keep opaque bytes to state handles and raw
+   wire input — never an untyped payload field (`references/wit-boundary.md`).
+4. **Validate without a Rust toolchain** by generating bindings:
    `componentize-py -d <wit> -w <world> bindings out/`. If the world resolves,
    the contract is well-formed and implementable in any language.
-4. Scaffold the guest (the real kernel via `cargo component build`) and a host
+5. Scaffold the guest (the real kernel via `cargo component build`) and a host
    (JS via `jco`, or Python via `componentize-py`). Recipes and the honest
    caveats (the CPython guest pulls WASI; the Rust guest imports nothing; no
    server-side threading) are in `references/hosts.md`.
@@ -164,6 +174,14 @@ assume it's just hexagonal by another name). Rationale and the prior-art map
 are in `references/charter.md`; the detailed hexagonal-vs-domain-kernel
 comparison — including a walkthrough against a conventional TS/Java/Kotlin/Go
 hexagonal implementation — is in `references/hexagonal-comparison.md`.
+
+Two more rules. **Do not oversell:** every charter ends with where the
+pattern loses, and never claims a scaling, uptime or fault-tolerance benefit
+— those belong to the shell. **Record the boundary:** for each kernel, offer
+a decision record from `assets/KERNEL_ADR.md` that names the wider and
+narrower boundaries rejected. For readers who know DDD or *The Hard Parts*,
+`references/charter.md` has the extra ancestors, the companion book, and the
+reuse-options table.
 
 ---
 
