@@ -159,10 +159,45 @@ DIRECT_IO = re.compile(
     r"\breqwest::|\btokio::|\bhyper::|\brand::")
 
 
+# `use <crate>::path::{a, b as c};` — the names a banned crate binds locally.
+USE_LINE = re.compile(r"^\s*(?:pub\s+(?:\([^)]*\)\s+)?)?use\s+([^;]+);")
+
+
+def _bound_names(use_body: str) -> tuple[str, list[str]]:
+    """Return (crate, local names) for one `use` body, or ("", []) if unbanned.
+
+    A glob (`use rand::prelude::*`) binds nothing nameable, so it yields no
+    names — the `use` line itself is already reported as a banned path.
+    """
+    body = use_body.strip().lstrip(":")
+    crate = re.split(r"::|\s|\{", body, maxsplit=1)[0]
+    if not is_banned(crate):
+        return "", []
+    if "{" in body:
+        inner = body[body.index("{") + 1: body.rindex("}") if "}" in body else len(body)]
+        items = inner.split(",")
+    else:
+        items = [body]
+    names = []
+    for item in items:
+        item = item.strip()
+        if not item or item.endswith("*"):
+            continue
+        if " as " in item:
+            names.append(item.split(" as ")[-1].strip())
+            continue
+        last = item.split("::")[-1].strip()
+        if last and last != "self":
+            names.append(last)
+    return crate, names
+
+
 def _scan_file(f: Path):
     """Walk one file, tracking brace depth so `#[cfg(test)]` suppression ends
     with its module, and buffering multi-line public signatures."""
     out = []
+    imported = {}   # local name -> banned crate it came from
+    reported = set()  # names already reported once in this file
     depth = 0
     suppress_until = None     # depth the enclosing #[cfg(test)] block started at
     pending_cfg_test = False  # saw the attribute, waiting for the item it marks
@@ -235,6 +270,26 @@ def _scan_file(f: Path):
                         f"direct I/O / non-determinism in non-test code "
                         f"('{hit.group(0)}') — move it to an adapter; inject time, "
                         f"randomness and the filesystem"))
+
+        # --- a banned crate reached through an imported short name -----------
+        # `use rand::rng;` then `rng()` further down: the import is caught by
+        # the rule above, the call site is not. Report the first such use per
+        # name, so one import does not bury the report in repeats.
+        use_hit = USE_LINE.match(code)
+        if use_hit:
+            crate, names = _bound_names(use_hit.group(1))
+            for n in names:
+                imported.setdefault(n, crate)
+        else:
+            for name, crate in imported.items():
+                if name in reported:
+                    continue
+                if re.search(r"(?<![\w.])" + re.escape(name) + r"\s*(\(|::)", code):
+                    reported.add(name)
+                    out.append((HARD, loc,
+                                f"'{name}' comes from banned crate '{crate}' — the "
+                                f"import is short but the dependency is real (inject "
+                                f"the capability at the seam)"))
 
         depth += delta
         if pub_type_until is not None and depth <= pub_type_until:

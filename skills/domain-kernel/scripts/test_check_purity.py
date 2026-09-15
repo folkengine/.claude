@@ -174,6 +174,56 @@ class DefaultFeaturePurity(unittest.TestCase):
         self.assertIn("HARD", out)
 
 
+class ImportedNameUse(unittest.TestCase):
+    """A banned crate imported once and then called by its short name.
+
+    Found in pkcore 0.14.0 (`src/cards.rs`): `use rand::rng;` was flagged, but
+    the ambient `rng()` call site below it was not, so the evidence pointed at
+    the import instead of at the impurity.
+    """
+
+    def test_call_of_an_imported_banned_name_is_hard(self):
+        code, out = run_checker(
+            PURE_CARGO,
+            "use rand::rng;\n"
+            "pub fn shuffle() { let mut r = rng(); let _ = &mut r; }\n",
+        )
+        self.assertEqual(code, 1, out)
+        self.assertIn("rand", out)
+        self.assertIn(":2", out)   # the call site, not only the import
+
+    def test_call_of_an_aliased_banned_name_is_hard(self):
+        code, out = run_checker(
+            PURE_CARGO,
+            "use rand::rng as seed_source;\n"
+            "pub fn shuffle() { let _ = seed_source(); }\n",
+        )
+        self.assertEqual(code, 1, out)
+        self.assertIn(":2", out)
+
+    def test_imported_name_in_a_test_module_is_not_flagged(self):
+        code, out = run_checker(
+            PURE_CARGO,
+            "pub fn pure(a: u8) -> u8 { a }\n"
+            "\n"
+            "#[cfg(test)]\n"
+            "mod tests {\n"
+            "    use rand::rng;\n"
+            "    #[test] fn t() { let _ = rng(); }\n"
+            "}\n",
+        )
+        self.assertEqual(code, 0, out)
+
+    def test_same_name_from_an_unbanned_crate_is_not_flagged(self):
+        code, out = run_checker(
+            PURE_CARGO,
+            "use itertools::Itertools;\n"
+            "use crate::util::rng;\n"
+            "pub fn f() { let _ = rng(); }\n",
+        )
+        self.assertEqual(code, 0, out)
+
+
 class CleanCrate(unittest.TestCase):
     """No false positives on a crate that honours every invariant."""
 
