@@ -1,0 +1,280 @@
+#!/usr/bin/env bash
+# push — push skills, commands, and hooks from this repo into ~/.claude.
+#
+# Source: <repo>/skills/    -> ~/.claude/skills/
+#         <repo>/commands/  -> ~/.claude/commands/
+#         <repo>/hooks/     -> ~/.claude/hooks/
+#
+# Usage: push [--force]
+#
+# The push is direction-aware. Rather than assuming the repo always wins,
+# push records a content hash per entry at each successful sync (in
+# ~/.claude/.push-state) and compares both sides against that baseline:
+#
+#   repo moved, local didn't   -> push it
+#   local moved, repo didn't   -> STOP, local is ahead; run pull first
+#   both moved                 -> STOP, real conflict; show it, touch nothing
+#   neither moved / identical  -> skip
+#
+# That baseline is inferred, never declared. A version field in frontmatter
+# would do the same job only when it was remembered, and its failure mode is
+# a silent skip; a hash cannot be forgotten or wrong. Whenever the two sides
+# do agree, that agreement becomes the new baseline, so the state file heals
+# itself after a pull run and needs no bookkeeping from pull.
+#
+# --force resolves everything in the repo's favour. It is the only way past
+# a conflict, since the alternative (pull) would resolve it the other way
+# by taking the local copy wholesale.
+#
+# Because ~/.claude is not a git repo, an overwrite there is unrecoverable in
+# a way that pull's overwrite of the repo is not. So any copy about to be
+# replaced is first saved under ~/.claude/.push-backups/<utc-timestamp>/,
+# a location deliberately outside skills/, commands/, and hooks/ so Claude
+# Code never loads a stale skill out of it.
+#
+# Entries that exist only in ~/.claude are never touched or deleted — a push
+# adds and updates, it does not mirror deletions.
+
+set -euo pipefail
+
+force=no
+for arg in "$@"; do
+    case "$arg" in
+        --force) force=yes ;;
+        -h|--help) sed -n '2,36p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        *) printf 'push: unknown argument %q (try --help)\n' "$arg" >&2; exit 2 ;;
+    esac
+done
+
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+repo_root="$(cd -- "$script_dir/.." && pwd)"
+
+src_skills="$repo_root/skills"
+src_commands="$repo_root/commands"
+src_hooks="$repo_root/hooks"
+dst_skills="$HOME/.claude/skills"
+dst_commands="$HOME/.claude/commands"
+dst_hooks="$HOME/.claude/hooks"
+
+# Skill names that must never be pushed out, one per line, in
+# <repo>/ignore.txt. Blank lines and lines starting with # are ignored.
+ignore_file="$repo_root/ignore.txt"
+ignore_skills=()
+if [[ -f "$ignore_file" ]]; then
+    while IFS= read -r line; do
+        line="${line%%#*}"
+        line="$(echo "$line" | tr -d '[:space:]')"
+        [[ -n "$line" ]] && ignore_skills+=("$line")
+    done < "$ignore_file"
+fi
+
+is_ignored_skill() {
+    local name="$1" ig
+    for ig in "${ignore_skills[@]:-}"; do
+        [[ "$ig" == "$name" ]] && return 0
+    done
+    return 1
+}
+
+backup_root="$HOME/.claude/.push-backups/$(date -u +%Y%m%dT%H%M%SZ)"
+state_file="$HOME/.claude/.push-state"
+mkdir -p "$HOME/.claude"
+state_next="$(mktemp -t push)"
+
+added_skills=()
+updated_skills=()
+added_commands=()
+updated_commands=()
+added_hooks=()
+updated_hooks=()
+skipped=0
+backed_up=0
+attention=0
+
+# Content hash of a file or directory tree. .DS_Store is excluded so Finder
+# droppings on the ~/.claude side never read as a real difference. Hashes of
+# "<hash>  <path>" lines are sorted before the final digest, so the result
+# depends on content and layout but not on find's traversal order.
+hash_of() {
+    local path="$1"
+    if [[ -d "$path" ]]; then
+        ( cd "$path" \
+            && find . -type f ! -name '.DS_Store' -exec shasum -a 256 {} + 2>/dev/null \
+            | LC_ALL=C sort \
+            | shasum -a 256 \
+            | awk '{print $1}' )
+    elif [[ -f "$path" ]]; then
+        shasum -a 256 "$path" | awk '{print $1}'
+    fi
+}
+
+# Baseline hash recorded at the last successful sync, empty if never synced.
+state_get() {
+    [[ -f "$state_file" ]] || return 0
+    awk -v k="$1" '$1==k{print $2; exit}' "$state_file"
+}
+
+state_put() {
+    printf '%s %s\n' "$1" "$2" >> "$state_next"
+}
+
+# Save a copy that is about to be replaced. Created lazily so a run with
+# nothing to overwrite leaves no empty backup directory behind.
+back_up() {
+    local path="$1" label="$2"
+    mkdir -p "$backup_root/${label}s"
+    cp -R "$path" "$backup_root/${label}s/"
+    backed_up=$((backed_up + 1))
+}
+
+# Sync top-level entries from $1 (source) into $2 (destination), labeling
+# output with $3 (skill|command|hook), appending newly-added names to the
+# global array named by $4 and updated names to the array named by $5.
+sync_dir() {
+    src="$1"
+    dst="$2"
+    label="$3"
+    added_name="$4"
+    updated_name="$5"
+
+    if [[ ! -d "$src" ]]; then
+        printf '  (no source dir %s — skipping)\n' "$src"
+        return 0
+    fi
+
+    mkdir -p "$dst"
+
+    # nullglob: empty dir yields no iterations instead of a literal '*'.
+    # dotglob is left off so .DS_Store and friends are never copied.
+    shopt -s nullglob
+    for entry in "$src"/*; do
+        name="$(basename "$entry")"
+
+        if [[ "$label" == "skill" ]] && is_ignored_skill "$name"; then
+            printf '  x %s: %s (ignored, see ignore.txt)\n' "$label" "$name"
+            continue
+        fi
+
+        key="$label/$name"
+        h_repo="$(hash_of "$entry")"
+
+        if [[ ! -e "$dst/$name" ]]; then
+            cp -R "$entry" "$dst/"
+            state_put "$key" "$h_repo"
+            eval "${added_name}+=(\"\$name\")"
+            printf '  + %s: %s\n' "$label" "$name"
+            continue
+        fi
+
+        h_local="$(hash_of "$dst/$name")"
+        h_state="$(state_get "$key")"
+
+        if [[ "$h_repo" == "$h_local" ]]; then
+            # Already in agreement. Record it: this is what lets the state
+            # file recover on its own after a pull run moved both sides.
+            state_put "$key" "$h_repo"
+            skipped=$((skipped + 1))
+            continue
+        fi
+
+        if [[ -n "$h_state" && "$h_state" == "$h_local" ]] || [[ "$force" == yes ]]; then
+            # The ~/.claude copy is untouched since the last sync (or the
+            # user asked for the repo to win), so the repo is authoritative.
+            back_up "$dst/$name" "$label"
+            # Replace wholesale rather than merging, so files deleted from
+            # the repo copy are reflected instead of lingering forever.
+            rm -rf "$dst/$name"
+            cp -R "$entry" "$dst/"
+            state_put "$key" "$h_repo"
+            eval "${updated_name}+=(\"\$name\")"
+            if [[ "$force" == yes && "$h_state" != "$h_local" ]]; then
+                printf '  ~ %s: %s (forced, previous copy backed up)\n' "$label" "$name"
+            else
+                printf '  ~ %s: %s (updated, previous copy backed up)\n' "$label" "$name"
+            fi
+            continue
+        fi
+
+        attention=$((attention + 1))
+        if [[ -n "$h_state" && "$h_state" == "$h_repo" ]]; then
+            printf '  ! %s: %s — LOCAL is ahead of the repo; run pull first\n' \
+                "$label" "$name"
+        else
+            if [[ -z "$h_state" ]]; then
+                printf '  ! %s: %s — CONFLICT: no sync baseline, cannot tell which side is newer\n' \
+                    "$label" "$name"
+            else
+                printf '  ! %s: %s — CONFLICT: both sides changed since last sync\n' \
+                    "$label" "$name"
+            fi
+            printf '        repo:  %s\n' "$entry"
+            printf '        local: %s\n' "$dst/$name"
+            # diff exits 1 precisely when it finds differences, which is the
+            # only case that reaches here. Under `set -e` with pipefail that
+            # would abort the run inside the branch whose job is to report the
+            # conflict, so the status is swallowed deliberately.
+            { diff -rq "$entry" "$dst/$name" 2>&1 || true; } \
+                | sed 's/^/          /' | head -5
+        fi
+        # State is deliberately left alone: the two sides are still out of
+        # sync, so the old baseline remains the last point they agreed.
+    done
+    shopt -u nullglob
+}
+
+printf 'pushing skills from %s -> %s\n' "$src_skills" "$dst_skills"
+sync_dir "$src_skills" "$dst_skills" skill added_skills updated_skills
+
+printf '\npushing commands from %s -> %s\n' "$src_commands" "$dst_commands"
+sync_dir "$src_commands" "$dst_commands" command added_commands updated_commands
+
+printf '\npushing hooks from %s -> %s\n' "$src_hooks" "$dst_hooks"
+sync_dir "$src_hooks" "$dst_hooks" hook added_hooks updated_hooks
+
+# Carry forward baselines for entries this run never saw — an entry removed
+# from the repo but still present in ~/.claude keeps the last point the two
+# agreed, so a later re-add can still tell which side moved.
+if [[ -f "$state_file" ]]; then
+    while read -r k v; do
+        [[ -n "${k:-}" ]] || continue
+        if ! awk -v key="$k" '$1==key{f=1} END{exit !f}' "$state_next"; then
+            printf '%s %s\n' "$k" "$v" >> "$state_next"
+        fi
+    done < "$state_file"
+fi
+LC_ALL=C sort -o "$state_next" "$state_next"
+mv "$state_next" "$state_file"
+
+printf '\n---\n'
+printf 'added %d skill(s), %d command(s), %d hook(s); updated %d; skipped %d unchanged entr%s' \
+    "${#added_skills[@]}" "${#added_commands[@]}" "${#added_hooks[@]}" \
+    "$(( ${#updated_skills[@]} + ${#updated_commands[@]} + ${#updated_hooks[@]} ))" \
+    "$skipped" \
+    "$([[ $skipped -eq 1 ]] && echo y || echo ies)"
+if (( attention > 0 )); then
+    printf '; %d need%s attention.\n' "$attention" "$([[ $attention -eq 1 ]] && echo s || echo '')"
+else
+    printf '.\n'
+fi
+
+if (( backed_up > 0 )); then
+    printf '\n%d replaced cop%s saved under %s\n' \
+        "$backed_up" \
+        "$([[ $backed_up -eq 1 ]] && echo y || echo ies)" \
+        "$backup_root"
+fi
+
+if (( attention > 0 )); then
+    printf '\nNothing was overwritten for the %d entr%s above. Resolve by running\n' \
+        "$attention" "$([[ $attention -eq 1 ]] && echo y || echo ies)"
+    printf 'pull (takes the ~/.claude copy) or push --force (takes the repo copy).\n'
+fi
+
+if (( ${#added_skills[@]} > 0 )); then
+    printf '\nReminder: add each new skill to README.md under "## Skills"\n'
+    printf '          using the skill name and its frontmatter description.\n'
+    printf 'New skills:\n'
+    printf '  - %s\n' "${added_skills[@]}"
+fi
+
+exit $(( attention > 0 ))

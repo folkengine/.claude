@@ -137,3 +137,6 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# This repo's sync scripts live in bin/, which the global gitignore excludes.
+!bin/
