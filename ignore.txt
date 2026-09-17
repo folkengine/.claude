@@ -8,3 +8,11 @@
 
 eli5
 graphify
+
+# Owned by folkengine/dkskills — that repo is the source of truth.
+# Sync them with dkskills/bin/push and dkskills/bin/pull instead.
+dddocs
+domain-kernel
+kernel-testkit
+muratori
+reusability
