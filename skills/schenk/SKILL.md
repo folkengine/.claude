@@ -1,6 +1,6 @@
 ---
 name: schenk
-description: Perform a Schenkerian analysis of a musical piece or section and render it as a Schenker graph with LilyPond, producing .ly, .svg, and .pdf outputs plus a companion prose analysis — optionally layered with a GTTM (Lerdahl & Jackendoff) metrical dot-grid and grouping brackets. Use when the user types `/schenk <piece>` or asks for a "Schenkerian analysis", "Schenker graph/diagram", "Ursatz", "Urlinie", "voice-leading reduction", "structural analysis of this piece", or a "GTTM / metrical / grouping analysis" — even if they never say the word "schenk". Accepts a piece name, a score file (LilyPond, MusicXML, ABC, MIDI), or pasted notation. Asks for a reference score when the notes aren't known with confidence. Requires LilyPond (offers to install it if missing).
+description: Perform a Schenkerian analysis of a musical piece or section and render it as a Schenker graph with LilyPond, producing .ly, .svg, and .pdf outputs plus a companion prose analysis — optionally layered with a GTTM (Lerdahl & Jackendoff) metrical dot-grid and grouping brackets. Also renders a pure-rhythm notation (a one-line drum-part staff: durations and rests, no pitches). Use when the user types `/schenk <piece>` or asks for a "Schenkerian analysis", "Schenker graph/diagram", "Ursatz", "Urlinie", "voice-leading reduction", "structural analysis of this piece", a "GTTM / metrical / grouping analysis", or "just the rhythm" / "rhythm only" / "rhythmic notation" / "as a drum part" / "no pitches" — even if they never say the word "schenk". Accepts a piece name, a score file (LilyPond, MusicXML, ABC, MIDI), or pasted notation. Asks for a reference score when the notes aren't known with confidence. Requires LilyPond (offers to install it if missing).
 ---
 
 # Schenk — Schenkerian analysis graphs via LilyPond
@@ -14,6 +14,31 @@ tonal structure, engrave the graph with LilyPond using the stylesheets in
 `/schenk <piece or file or nothing>` — `<piece>` may be a work + measure
 range ("Bach BWV 846 Prelude, mm. 1–8"), a path to a score file, or empty
 (then ask what to analyze).
+
+## Rhythm mode (pure rhythmic notation)
+
+If the user asks for the rhythm only — "rhythmic notation", "as a drum part",
+"just the rhythm", "no pitches" — skip the analysis. Run Workflow steps 1–2
+(preflight; gather the music, with the same reference-score rule), then:
+
+1. Output dir: `docs/schenker/<slug>/`. Copy `references/rhythm.ily` and
+   `references/render.sh` into it. Do not copy `schenker.ily`.
+2. Write `rhythm.ly` → `rhythmMusic`, music-only like the other level files.
+   Model it on `references/rhythm.ly`: `\time`, `\rhythmStyle`, then every
+   note as `c` with the real durations, rests, beams, ties, dots,
+   articulations and fermatas. Keep barlines, meter and any tempo mark.
+   Drop pitch, key, clef, slurs and dynamics — they are not rhythm.
+3. Write the thin assembly `<slug>-rhythm.ly`: `\version`, `\include
+   "rhythm.ily"`, `\include "rhythm.ly"`, a `\header`, one `\score` with
+   `\new RhythmicStaff \rhythmMusic` and `\layout { \rhythmLayout }`. Model on
+   `references/example-rhythm.ly` (the opening of Beethoven's 5th).
+4. `bash render.sh <output-dir>`, then view the SVG as in step 5.6. Check:
+   rests and fermatas present, beams follow the meter, notes sit on the line.
+5. Write a short `<slug>.md`: passage, meter, the rhythm as text (e.g.
+   "eighth rest, 3 eighths, half + fermata"), the embedded SVG, a file table.
+
+Rhythm mode can also run beside a full analysis: add the same `rhythm.ly` as
+an extra deliverable.
 
 ## Workflow
 
@@ -118,6 +143,8 @@ GPR/MPR reasoning) when enabled; embedded SVG image(s); a file table.
 | `<slug>.svg`, `<slug>.pdf` | rendered assembled graph |
 | `foreground.svg/.pdf` … `gttm-layer.svg/.pdf` | rendered per-level images |
 | `<slug>.md` | prose analysis with embedded SVG |
+| `rhythm.ily`, `rhythm.ly`, `<slug>-rhythm.ly` | rhythm mode only: stylesheet, `rhythmMusic` block, assembly |
+| `<slug>-rhythm.svg/.pdf`, `rhythm.svg/.pdf` | rhythm mode only: rendered rhythm staff |
 
 With the GTTM layer, either add it to the main graph or produce a second
 `<slug>-gttm.ly` variant — ask if the user has a preference.
@@ -126,4 +153,4 @@ With the GTTM layer, either add it to the main graph or produce a second
 
 The master stylesheets live in `references/`. If a notation bug is fixed
 during a run, back-port the fix to the masters and re-run the smoke tests
-(`example.ly`, `example-gttm.ly` must compile warning-free).
+(`example.ly`, `example-gttm.ly`, `example-rhythm.ly` must compile warning-free).

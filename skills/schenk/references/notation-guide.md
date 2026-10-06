@@ -35,6 +35,23 @@ heads. Half notes themselves cannot be beamed.
 Time-span / prolongational **trees are not rendered** — discuss their head
 choices in the companion prose instead.
 
+## Pure-rhythm symbols (`rhythm.ily`)
+
+Rhythm mode engraves a drum-part-style rhythm: one staff line, no pitch.
+
+| Symbol | Meaning | How to write it |
+|---|---|---|
+| One-line staff | Rhythm only; pitch is ignored | `\new RhythmicStaff \rhythmMusic` |
+| Notehead on the line | Attack (a "drum beat") | write every note as `c` with its real duration |
+| Rest | Silence | `r8`, `r4`, … |
+| Fermata, accent, tie, dot | Duration/articulation that is rhythm | `c2\fermata`, `c4->`, `c4~ c8`, `c4.` |
+| Meter, barlines | Kept (unlike `schenkerLayout`) | `\time 2/4`, `|`, `\bar "|."` |
+
+`rhythm.ily` is independent of `schenker.ily` — never include both in one
+file, because `schenkerLayout` strips the meter and barlines rhythm needs.
+Real drum-kit parts (`\drummode`, `DrumStaff`) are a different job: use them
+only if the user asks for named drums rather than plain rhythm.
+
 ## LilyPond 2.26 gotchas (learned the hard way — do not rediscover)
 
 1. **`Stem.transparent = ##t` hides the Beam too.** Use
@@ -82,6 +99,7 @@ three bars of 2/4) so they compose without adjustment.
 | `background-urlinie.ly` | `bgUpper` | open heads, caret degrees, Urlinie beam |
 | `background-bass.ly` | `bgBass` | open heads, Roman numerals, Bassbrechung beam |
 | `gttm-layer.ly` | `dotsEighth` / `dotsQuarter` / `dotsMeasure` | metrical dot-grid rows (one per level) |
+| `rhythm.ly` | `rhythmMusic` | pure rhythm (Beethoven 5, mm. 1–5); rhythm mode only, uses `rhythm.ily` |
 
 Assemble by `\include`-ing the levels you need after the stylesheets, then
 referencing the variables in the `\score` — see `example.ly` (all four Schenker
@@ -104,5 +122,8 @@ contain `schenker.ily` (and `gttm.ily` when a GTTM layer is used).
   `background-urlinie.ly`, adding the dot grid and grouping brackets; tests
   `gttm.ily`.
 
-Both must compile warning-free. If a stylesheet or building-block edit breaks
+- `example-rhythm.ly` — assembles `rhythm.ly` with `rhythm.ily` (rhythm
+  mode); separate from the two above.
+
+All three must compile warning-free. If a stylesheet or building-block edit breaks
 them, fix it before using it in a real analysis.
