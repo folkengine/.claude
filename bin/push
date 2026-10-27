@@ -19,8 +19,8 @@
 # That baseline is inferred, never declared. A version field in frontmatter
 # would do the same job only when it was remembered, and its failure mode is
 # a silent skip; a hash cannot be forgotten or wrong. Whenever the two sides
-# do agree, that agreement becomes the new baseline, so the state file heals
-# itself after a pull run and needs no bookkeeping from pull.
+# do agree, that agreement becomes the new baseline. bin/pull reads and
+# writes the same baseline, so each script can tell when the other side moved.
 #
 # --force resolves everything in the repo's favour. It is the only way past
 # a conflict, since the alternative (pull) would resolve it the other way
@@ -91,15 +91,17 @@ skipped=0
 backed_up=0
 attention=0
 
-# Content hash of a file or directory tree. .DS_Store is excluded so Finder
-# droppings on the ~/.claude side never read as a real difference. Hashes of
-# "<hash>  <path>" lines are sorted before the final digest, so the result
-# depends on content and layout but not on find's traversal order.
+# Content hash of a file or directory tree. .DS_Store and __pycache__ are
+# excluded so Finder droppings and a test run's bytecode never read as a real
+# difference. Hashes of "<hash>  <path>" lines are sorted before the final
+# digest, so the result depends on content and layout but not on find's
+# traversal order. bin/pull must hash the same way.
 hash_of() {
     local path="$1"
     if [[ -d "$path" ]]; then
         ( cd "$path" \
-            && find . -type f ! -name '.DS_Store' -exec shasum -a 256 {} + 2>/dev/null \
+            && find . -name __pycache__ -prune \
+                -o -type f ! -name '.DS_Store' -exec shasum -a 256 {} + 2>/dev/null \
             | LC_ALL=C sort \
             | shasum -a 256 \
             | awk '{print $1}' )
@@ -270,11 +272,20 @@ if (( attention > 0 )); then
     printf 'pull (takes the ~/.claude copy) or push --force (takes the repo copy).\n'
 fi
 
-if (( ${#added_skills[@]} > 0 )); then
+# Only nag about new skills the README does not link yet. A skill counts as
+# listed when README.md holds a link into its directory, `(skills/<name>/`.
+unlisted_skills=()
+for name in "${added_skills[@]:-}"; do
+    [[ -n "$name" ]] || continue
+    grep -qF "(skills/$name/" "$repo_root/README.md" 2>/dev/null \
+        || unlisted_skills+=("$name")
+done
+
+if (( ${#unlisted_skills[@]} > 0 )); then
     printf '\nReminder: add each new skill to README.md under "## Skills"\n'
     printf '          using the skill name and its frontmatter description.\n'
     printf 'New skills:\n'
-    printf '  - %s\n' "${added_skills[@]}"
+    printf '  - %s\n' "${unlisted_skills[@]}"
 fi
 
 exit $(( attention > 0 ))
