@@ -63,6 +63,7 @@ that contains those placeholders.
 | `.tool-versions` | generated | See § .tool-versions below. |
 | `Makefile` | this file, § Makefile contract | Copy the skeleton verbatim; stack file fills phase bodies. |
 | `bin/security-scan` | generated | See § bin/ scripts below; `chmod +x`. |
+| `bin/secrets-scan` | this file, § bin/ scripts | Copy verbatim; `chmod +x`. Backs `make betterleaks` (§ Makefile contract → The `betterleaks` target). |
 | `.github/workflows/ci.yaml` | generated | See § CI workflows below. |
 | `.github/workflows/security.yaml` | this file, § CI workflows | Copy the skeleton verbatim; stack file supplies the toolchain setup step(s). |
 | `.devcontainer/devcontainer.json` | generated | See § Devcontainer below. |
@@ -111,6 +112,8 @@ Generate `README.md` with, in this order:
    `- **Linting:** ruff — see [toolchain decisions](.okf/decisions/toolchain.md)`)
    rather than duplicating the rationale prose in the README. Do not restate
    the reasoning here even briefly — one sentence of "what", then the link.
+   Always include a **Secrets scanning:** bullet for betterleaks that names
+   `make betterleaks` and `docs/betterleaks/`.
 
 ## § No YAML linter
 
@@ -193,6 +196,32 @@ Rule: `ayce` is ALWAYS `default`; the seven phase names (`clean`, `fmt`,
 `build`, `test`, `lint`, `security-scan`, `docs`) never vary and never get
 renamed; stacks may add extra targets but never rename these.
 
+### The `betterleaks` target
+
+Every scaffold, every stack (c included), gets this target. Append it as the
+last block of the Makefile, after the stack file's own extra targets:
+
+```makefile
+.PHONY: betterleaks
+betterleaks: ## secrets scan (betterleaks); dated report under docs/betterleaks/
+	./bin/secrets-scan
+```
+
+It is standalone on purpose. It is **not** an `ayce` prerequisite and no CI
+workflow runs it, because betterleaks is installed outside `.tool-versions`
+(Homebrew or a release binary) and a missing tool must not turn the gate red.
+What `bin/secrets-scan` does (§ bin/ scripts):
+
+- betterleaks missing → prints where to get it, exits 1.
+- betterleaks present → scans git history (`betterleaks git`) inside a work
+  tree, or plain files (`betterleaks dir`) before `git init`, and writes
+  `docs/betterleaks/<YYYY-MM-DD>-betterleaks.json`. Exits 1 when it finds
+  leaks; the report is still written.
+
+The report is always run with `--redact`, so it never holds a secret's value
+and is safe to commit. A second run on the same day overwrites that day's
+report.
+
 ## § bin/ scripts
 
 Write `bin/security-scan` as an executable shell script:
@@ -211,6 +240,44 @@ Run `chmod +x bin/security-scan` after writing it. No check logic may live in
 the Makefile or in any CI workflow — both call this one script. If a future
 stack needs more than one scanner script, they all still live under `bin/`
 and are all called from here, not inlined elsewhere.
+
+Write `bin/secrets-scan` exactly as below (no stack fills anything in), then
+`chmod +x bin/secrets-scan`. It is the only script behind `make betterleaks`
+and is separate from `bin/security-scan`: dependency advisories gate `ayce`,
+the secrets scan does not.
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! command -v betterleaks >/dev/null 2>&1; then
+  echo "secrets-scan: betterleaks is not installed." >&2
+  echo "  Homebrew:  brew install betterleaks" >&2
+  echo "  Releases:  https://github.com/betterleaks/betterleaks/releases" >&2
+  exit 1
+fi
+
+report_dir=docs/betterleaks
+report="$report_dir/$(date +%Y-%m-%d)-betterleaks.json"
+mkdir -p "$report_dir"
+
+# Scan history when this is a git work tree; plain files before `git init`.
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  mode=git
+else
+  mode=dir
+fi
+
+status=0
+betterleaks "$mode" . --no-banner --redact \
+  --report-format json --report-path "$report" || status=$?
+echo "secrets-scan: report written to $report" >&2
+exit "$status"
+```
+
+Never name this script `bin/betterleaks`. Developers often put `./bin` on
+`PATH` (direnv `PATH_add bin`, shell profiles), and then the script's own
+`betterleaks` call runs the script again, in an endless loop.
 
 ## § CI workflows
 
@@ -380,11 +447,15 @@ decisions must exist before you write rationale about them.
    not only on missing `type`:
    - `.okf/decisions/toolchain.md` — frontmatter `type: decision`; a table of
      tool → version → one-line why, sourced from the stack file's
-     `## Toolchain` section.
+     `## Toolchain` section, plus a betterleaks row (version: "not pinned —
+     installed outside `.tool-versions`"; why: secrets scan behind
+     `make betterleaks`).
    - `.okf/processes/quality-gate.md` — frontmatter `type: process`;
      describes what each `ayce` phase runs, what "green" means, that
      `make security-scan` exists standalone, and that `security.yaml` runs it
-     daily.
+     daily. Also describe `make betterleaks`: a secrets scan outside `ayce`
+     and outside CI, that writes a dated, redacted report to
+     `docs/betterleaks/`.
    Update `index.md`'s concept listing to include both new files (whichever
    path created `index.md`).
 3. Validate the bundle: locate the validator the same way as step 1:

@@ -102,6 +102,8 @@ roster. Never read more than one stack file per run.
 - Never run state-changing git commands. Print them for the user.
 - `make ayce` is always the default Makefile target; its meaning never varies.
 - One security-scan definition (`bin/security-scan`); Makefile and CI call it.
+- Every scaffold gets `make betterleaks` → `bin/secrets-scan` (baseline.md,
+  § Makefile contract). It stays out of `ayce` and out of CI.
 - Every version-declaring location agrees. The set is stack-dependent — the
   baseline four plus whatever the stack file adds — so enumerate it per stack
   and never assert a fixed count.
