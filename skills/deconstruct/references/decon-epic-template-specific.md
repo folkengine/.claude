@@ -13,8 +13,8 @@ time and say what it means. A reader who stops here knows what the slice
 does and why. Link the sibling epics this slice hands off to. -->
 
 ## Context
-<!-- What this slice is, and a bulleted "This epic does **not** cover:" list
-with links to the epics that do. -->
+<!-- One or two sentences on what this slice is, then a bulleted "This epic
+does **not** cover:" list with links to the epics that do. -->
 
 ## Status
 | Component | Status |
@@ -38,7 +38,8 @@ specific-profile.md). This is what a rebuild must match. -->
 
 ## Design
 <!-- A small ASCII sketch of the flow, then **Why …** paragraphs: the domain
-reason for each rule that is not obvious. No mechanism here. -->
+reason for each rule that is not obvious. No mechanism here. Lists of
+cases or properties go in bullets, not paragraphs. -->
 
 ## How <project> does it
 <!-- One sentence on where this slice lives in the code (which crate /
@@ -54,8 +55,8 @@ sentences tying this code to Scope rule N:
 // …
 ```
 
-Close with anything surprising: a quirk the vectors record, a place the
-code and the design doc disagree (→ SD flag). -->
+Close with anything surprising, as bullets: a quirk the vectors record, a
+place the code and the design doc disagree (→ SD flag). -->
 
 ## Perspectives
 | Perspective | May | Must not | Boundary invariant |

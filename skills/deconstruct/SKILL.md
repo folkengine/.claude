@@ -131,7 +131,8 @@ For each epic, in dependency order:
 
 Also write `APPENDIX_Engineering_Constraints.md`: platform and engineering
 traits (e.g. no_std, wasm targets, MSRV, performance posture, CI matrix) as
-context for rebuilders, explicitly marked non-normative.
+context for rebuilders, explicitly marked non-normative. Write it as
+bold-led bullets, grouped under short headings, with no prose paragraphs.
 
 In SPECIFIC, write `README.md` last, from `readme-template-specific.md`: it
 walks one real example through every epic, so the epics must exist first.
@@ -152,7 +153,10 @@ walks one real example through every epic, so the epics must exist first.
    manifest ratings plus the engineering appendix; epics mention them only
    where a slice has a notable characteristic, and any lens finding stated
    as binding must carry an SD flag.
-4. **Links (SPECIFIC)** — run
+4. **Shape** — read each file for paragraphs that list three or more
+   parallel things (rules, cases, gaps, steps) and rewrite them as bullets.
+   Leave the paragraphs the methodology keeps as prose.
+5. **Links (SPECIFIC)** — run
    `python3 -I ~/.claude/skills/deconstruct/scripts/check_links.py <pack-dir>`
    and fix every line it prints. Then spot-check that each excerpt still
    matches the lines its link anchors.
@@ -172,6 +176,9 @@ Fix findings, then report the audit results in your final summary.
   Code references; Scope rules and vectors remain the contract.
 - **Pin one commit.** Every citation, excerpt and vector comes from the
   commit in the manifest's Source line.
+- **Bullets first.** Write every set of items as a list, one idea per
+  bullet. Keep paragraphs for chains of reasoning only. The shape rules are
+  in the methodology's "Writing shape: bullets first".
 - **Name the freedoms.** Every epic lists implementer's-choice items in
   `## Not specified`. Silence is ambiguous; a named freedom is not.
 - **Boundaries as invariants.** Perspective boundaries are domain rules

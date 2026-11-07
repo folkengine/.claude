@@ -5,8 +5,9 @@
 > citations appear only under Provenance and are non-normative.
 
 ## Context
-<!-- Where this slice sits in the domain; what this epic explicitly does NOT
-cover. Language-neutral. No source citations here. -->
+<!-- One or two sentences on where this slice sits in the domain, then a
+bulleted "This epic does **not** cover:" list. Language-neutral. No source
+citations here. -->
 
 ## Status
 | Component | Status |
@@ -17,7 +18,8 @@ cover. Language-neutral. No source citations here. -->
 <!-- Bulleted intent; load-bearing nouns bold. -->
 
 ## Scope
-<!-- The concrete rules a rebuild must obey. -->
+<!-- Numbered rules a rebuild must obey, each with a bold name:
+"1. **Binding.** …". Sub-bullets for a rule's cases. -->
 
 ## Domain map
 | Concept | Required behavior | Vectors |
@@ -25,8 +27,10 @@ cover. Language-neutral. No source citations here. -->
 | <concept> | <behavior> | `vectors/<slug>/<file>.json` |
 
 ## Design
-<!-- Language-neutral: prose, tables, pseudocode. Rationale = the domain
-constraint ("weak suits invert pip order"), never the original mechanism. -->
+<!-- Language-neutral: a sketch, tables, pseudocode, then one **Why …**
+paragraph per non-obvious rule. Rationale = the domain constraint ("weak
+suits invert pip order"), never the original mechanism. Lists of cases or
+properties go in bullets, not paragraphs. -->
 
 ## Perspectives
 | Perspective | May | Must not | Boundary invariant |

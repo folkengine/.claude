@@ -17,6 +17,37 @@ deltas for regeneration specs.
 | — | `## Not specified (implementer's choice)`: named freedoms |
 | — | `## Spec decisions`: SD-NN flags |
 
+## Writing shape: bullets first
+
+Both modes. Reference: `ImperialBower/bower` → `docs/deconstruct/repl/`
+(its appendix has no prose paragraphs at all).
+
+The default shape for any set of items is a list. Items are: rules, cases,
+verdicts, properties, steps, gaps, quirks, freedoms, costs, traits.
+
+- **One idea per bullet.** One to three short sentences.
+- **Lead-in, then members.** A line ending in a colon, then one sub-bullet
+  per member:
+  `- Two rules surprise people:` → `  - A transcript with no exchanges …`
+- **Numbered when order matters.** Steps that happen in sequence, phases,
+  exit criteria.
+- **Bold lead for a named item.** `- **matches**: they agree.` or
+  `- **Two layers.** A pure planning core …`
+- **Fragments in a lead-in list** end with `;`, the last with `.`:
+  `- how the original is layered;`
+- **Two levels of nesting at most.**
+- **A table** instead, when every item has the same two or more attributes
+  (Domain map, Perspectives, Coverage).
+
+A paragraph is the right shape for these, and only these:
+
+- a chain of reasoning, where each sentence needs the one before it (the
+  **Why** paragraphs in Design);
+- the connective text between code excerpts in a SPECIFIC walkthrough;
+- a spec decision blockquote;
+- the one or two opening sentences of Context, before its bullets;
+- the manifest's header block.
+
 ## Litmus: domain-essential vs implementation-accident
 
 Ask: **"Would a correct rebuild in another language be forced to make the
