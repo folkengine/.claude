@@ -9,6 +9,10 @@
 eli5
 graphify
 
+# Local run output and app-synced skills. Not mine to keep in this repo.
+backlog-workspace
+synced
+
 # Owned by folkengine/dkskills — that repo is the source of truth.
 # Sync them with dkskills/bin/push and dkskills/bin/pull instead.
 dddocs

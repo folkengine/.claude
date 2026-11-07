@@ -1,6 +1,6 @@
 ---
 name: epic
-description: Generate or update an EPIC design document — a domain-driven, phase-structured spec with Context, a Status table, Design sketches, phased Work Items, and a Verification block — in the pkcore/pkdealer house style. Use when the user types `/epic <thing>` or asks to "write an EPIC", "break this feature into stories or phases", "add a design doc to the docs folder", "story breakdown", "update/close out EPIC-NN", or "a progress report / evaluation of <branch>" — even if they never say the word EPIC. Do NOT trigger for ad-hoc planning of the current conversation's task (plan mode covers that) — only when the user wants a durable numbered document in the repo's docs folder. Project-agnostic: works in any repo, detects the existing documentation folder, and allocates the next EPIC number. Also produces the companion forms: progress/evaluation report, SIDEQUEST, DEFECT epic, TUTORIAL companion, and EXECUTION_PLAN / spec splits.
+description: "Generate or update an EPIC design document — a domain-driven, phase-structured spec with Context, a Status table, Design sketches, phased Work Items, and a Verification block — in the pkcore/pkdealer house style. Use when the user types `/epic <thing>` or asks to \"write an EPIC\", \"break this feature into stories or phases\", \"add a design doc to the docs folder\", \"story breakdown\", \"update/close out EPIC-NN\", or \"a progress report / evaluation of <branch>\" — even if they never say the word EPIC. Do NOT trigger for ad-hoc planning of the current conversation's task (plan mode covers that) — only when the user wants a durable numbered document in the repo's docs folder. Project-agnostic: works in any repo, detects the existing documentation folder, and allocates the next EPIC number. Also produces the companion forms: progress/evaluation report, SIDEQUEST, DEFECT epic, TUTORIAL companion, and EXECUTION_PLAN / spec splits."
 ---
 
 # EPIC
@@ -99,27 +99,29 @@ Never renumber or rename an existing EPIC.
 The canonical EPIC section order (full skeleton in `references/epic-template.md`):
 
 1. `# EPIC-NN: Title (ABBREV)`
-2. `## Context` — where the code stands today, `file.rs:line`-cited; state what
+2. `## Summary` — the debrief: five one-line bullets (**Builds / Why / Shape /
+   Proves it / Status**) a reader can take in without opening the rest.
+3. `## Context` — where the code stands today, `file.rs:line`-cited; state what
    this EPIC explicitly does **not** do.
-3. `## Status` — a `| Component | Status |` table (`Planned` / `**Complete**` /
+4. `## Status` — a `| Component | Status |` table (`Planned` / `**Complete**` /
    `**Deferred**` / `🔒 Gated`). This is the canonical live progress signal.
-4. `## Goals` — bulleted intent, load-bearing nouns **bold**.
-5. `## Scope` — the concrete rules the feature must obey.
-6. `## Domain map` *(optional, cardpack-style)* — a table of domain concept →
+5. `## Goals` — bulleted intent, load-bearing nouns **bold**.
+6. `## Scope` — the concrete rules the feature must obey.
+7. `## Domain map` *(optional, cardpack-style)* — a table of domain concept →
    code construct → status (✅/🟡/❌) when the mapping aids the reader.
-7. `## Design` — `###` per new type/module, each with a fenced ```rust API sketch
+8. `## Design` — `###` per new type/module, each with a fenced ```rust API sketch
    and the rationale (why this shape, not the alternative).
-8. `## Work Items` — `### Phase N — name` groups of numbered tasks
+9. `## Work Items` — `### Phase N — name` groups of numbered tasks
    (`- [ ] **0a.** …`), each citing its `path:line` target and the test/command
    that proves it. Phase 0 = prerequisites/feature-gating.
-9. `## Test Plan` — the named tests to add and what each asserts.
-10. `## Key Files` — a `| File | Role |` table.
-11. `## Reuse (do NOT recreate)` — existing code to build on, `path:line`-cited.
-12. `## Compatibility` — what is preserved vs added for downstream consumers.
-13. `## Dependencies` — **Blocks / Built on / Related**, naming other `EPIC-NN`s.
-14. `## Verification` — a fenced ```bash block of exact commands + numbered exit
+10. `## Test Plan` — the named tests to add and what each asserts.
+11. `## Key Files` — a `| File | Role |` table.
+12. `## Reuse (do NOT recreate)` — existing code to build on, `path:line`-cited.
+13. `## Compatibility` — what is preserved vs added for downstream consumers.
+14. `## Dependencies` — **Blocks / Built on / Related**, naming other `EPIC-NN`s.
+15. `## Verification` — a fenced ```bash block of exact commands + numbered exit
     criteria.
-15. `## Implementation corrigendum` — *added after shipping*: numbered
+16. `## Implementation corrigendum` — *added after shipping*: numbered
     design-vs-actual deltas + a Phase-status-summary table + inherited-debt note.
 
 ## Variants & naming

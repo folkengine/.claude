@@ -1,6 +1,6 @@
 ---
 name: presentation
-description: Generate a step-by-step demo runbook for a specific feature, EPIC, PR, or branch — what to type, what to click, what to point at on screen. Use when the user types `/presentation <thing>` or asks for a "demo script", "demo runbook", "walkthrough", "presentation script", "show-and-tell steps", "live demo plan", or "how do I demo X" — even if they don't use the word "presentation". Project-agnostic: works in any repo (Rust, Node, Python, mixed). Always invoke this skill when the user wants a physical, manual demonstration of work they (or someone) has done, as opposed to a written summary or code review.
+description: "Generate a step-by-step demo runbook for a specific feature, EPIC, PR, or branch — what to type, what to click, what to point at on screen. Use when the user types `/presentation <thing>` or asks for a \"demo script\", \"demo runbook\", \"walkthrough\", \"presentation script\", \"show-and-tell steps\", \"live demo plan\", or \"how do I demo X\" — even if they don't use the word \"presentation\". Project-agnostic: works in any repo (Rust, Node, Python, mixed). Always invoke this skill when the user wants a physical, manual demonstration of work they (or someone) has done, as opposed to a written summary or code review."
 version: 1.0.0
 ---
 

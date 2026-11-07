@@ -12,6 +12,20 @@
 <!-- H1 = the id + a human title + a short abbreviation in parens, e.g.
      "# EPIC-30: Fixed-Limit Hold'em (FLHE)". -->
 
+## Summary
+
+<!-- The debrief. Five one-line bullets a reader can take in without opening the
+     rest of the doc. Plain declarative sentences, no hedging, wrap at 80 cols.
+     Keep **Status** honest and in step with the Status table below. -->
+
+- **Builds:** <the thing this EPIC adds, named as the user sees it>
+- **Why:** <the gap or failure it closes>
+- **Shape:** <the key design move — the type / module / rule that carries it>
+- **Proves it:** <the test or command that shows it works>
+- **Status:** <Planned · Partly shipped · Shipped at `sha`, D Month YYYY>
+
+---
+
 ## Context
 
 <!-- Where the code stands TODAY. Cite exact src/path.rs:line anchors for every
