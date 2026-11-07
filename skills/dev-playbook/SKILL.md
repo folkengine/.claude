@@ -104,6 +104,9 @@ roster. Never read more than one stack file per run.
 - One security-scan definition (`bin/security-scan`); Makefile and CI call it.
 - Every scaffold gets `make betterleaks` → `bin/secrets-scan` (baseline.md,
   § Makefile contract). It stays out of `ayce` and out of CI.
+- Every scaffold gets `make open` (baseline.md, § Makefile contract → The
+  `open` target). It opens the repo's `origin` page in the browser. It stays
+  out of `ayce` and out of CI.
 - Every version-declaring location agrees. The set is stack-dependent — the
   baseline four plus whatever the stack file adds — so enumerate it per stack
   and never assert a fixed count.

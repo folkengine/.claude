@@ -113,7 +113,8 @@ Generate `README.md` with, in this order:
    rather than duplicating the rationale prose in the README. Do not restate
    the reasoning here even briefly — one sentence of "what", then the link.
    Always include a **Secrets scanning:** bullet for betterleaks that names
-   `make betterleaks` and `docs/betterleaks/`.
+   `make betterleaks` and `docs/betterleaks/`. Mention `make open` in the
+   "How to use" section as the way to open the repo's GitHub page.
 
 ## § No YAML linter
 
@@ -221,6 +222,26 @@ What `bin/secrets-scan` does (§ bin/ scripts):
 The report is always run with `--redact`, so it never holds a secret's value
 and is safe to commit. A second run on the same day overwrites that day's
 report.
+
+### The `open` target
+
+Every scaffold, every stack (c included), gets this target. Append it after
+the `betterleaks` block, as the last block of the Makefile. Copy it verbatim
+from the `bower` repo's Makefile:
+
+```makefile
+.PHONY: open
+open: ## open the repo's website (its origin remote on GitHub) in the default browser
+	@url=$$(git remote get-url origin | sed -E 's#^git@([^:]+):#https://\1/#; s#\.git$$##'); \
+	echo "opening $$url"; \
+	if command -v open >/dev/null 2>&1; then open "$$url"; else xdg-open "$$url"; fi
+```
+
+It is standalone on purpose. It is **not** an `ayce` prerequisite and no CI
+workflow runs it. It reads the `origin` remote, turns an SSH URL into an
+`https://` URL, and opens it with `open` (macOS) or `xdg-open` (Linux). If
+there is no `origin` remote yet, `git` prints an error and the target fails.
+That is correct before the first `git remote add`.
 
 ## § bin/ scripts
 
@@ -455,7 +476,8 @@ decisions must exist before you write rationale about them.
      `make security-scan` exists standalone, and that `security.yaml` runs it
      daily. Also describe `make betterleaks`: a secrets scan outside `ayce`
      and outside CI, that writes a dated, redacted report to
-     `docs/betterleaks/`.
+     `docs/betterleaks/`. Also describe `make open`: it opens the repo's
+     `origin` page in the browser, and it stays outside `ayce` and CI.
    Update `index.md`'s concept listing to include both new files (whichever
    path created `index.md`).
 3. Validate the bundle: locate the validator the same way as step 1:
