@@ -66,6 +66,7 @@ that contains those placeholders.
 | `bin/secrets-scan` | this file, § bin/ scripts | Copy verbatim; `chmod +x`. Backs `make betterleaks` (§ Makefile contract → The `betterleaks` target). |
 | `.github/workflows/ci.yaml` | generated | See § CI workflows below. |
 | `.github/workflows/security.yaml` | this file, § CI workflows | Copy the skeleton verbatim; stack file supplies the toolchain setup step(s). |
+| `.github/dependabot.yml` | this file, § Dependabot | Generate from the skeleton; pick ecosystems from the stack table there. |
 | `.devcontainer/devcontainer.json` | generated | See § Devcontainer below. |
 | `CLAUDE.md` | generated | See § CLAUDE.md skeleton below. |
 | `.github/copilot-instructions.md` | generated | See § CLAUDE.md skeleton below (three lines). |
@@ -113,7 +114,10 @@ Generate `README.md` with, in this order:
    rather than duplicating the rationale prose in the README. Do not restate
    the reasoning here even briefly — one sentence of "what", then the link.
    Always include a **Secrets scanning:** bullet for betterleaks that names
-   `make betterleaks` and `docs/betterleaks/`. Mention `make open` in the
+   `make betterleaks` and `docs/betterleaks/`.
+   Always include a **Dependency updates:** bullet that names Dependabot and
+   `.github/dependabot.yml`, and says that `make security-scan` does not read
+   Dependabot alerts. Mention `make open` in the
    "How to use" section as the way to open the repo's GitHub page.
 
 ## § No YAML linter
@@ -397,6 +401,74 @@ it exists so that eight stack files do not each carry their own.
 Refresh this table's values and its Verified date whenever a `/dev-playbook
 update` run resolves something newer.
 
+## § Dependabot
+
+Every scaffold gets `.github/dependabot.yml`. It turns on Dependabot
+**version updates**: GitHub opens a pull request when a dependency has a newer
+release. It is the playbook's "are my deps up to date" check. No stack gets a
+`make outdated` target instead — Rust's `cargo-outdated` is broken on edition
+2024 (see `rust.md`, § CI), and one GitHub-side mechanism works the same for
+every stack.
+
+Write this shape. Repeat the ecosystem block once per row the stack gets in
+the table below; keep `github-actions` and `devcontainers` on every stack:
+
+```yaml
+version: 2
+updates:
+  - package-ecosystem: "<ecosystem>"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      <ecosystem>-minor-and-patch:
+        update-types: ["minor", "patch"]
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      github-actions:
+        patterns: ["*"]
+  - package-ecosystem: "devcontainers"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+```
+
+The `groups` blocks fold minor and patch bumps into one PR per ecosystem.
+Major bumps still arrive one PR each, because they are the ones that break.
+
+| Stack | Ecosystem(s) besides `github-actions` and `devcontainers` |
+|---|---|
+| rust | `cargo` |
+| python | `uv` |
+| go | `gomod` |
+| java | `gradle` or `maven` — the build tool chosen at Init |
+| php | `composer` |
+| ts-lib, ts-next | `npm` |
+| cpp, c | none — deps come through CMake `FetchContent`/bzlmod or the system, which Dependabot does not read |
+
+Set `directory` to the folder that holds the manifest. For every stack above
+that is the repo root (`/`); change it only if the stack file moves the
+manifest.
+
+**Version updates are not alerts.** This file does not turn on Dependabot
+**alerts** (the Security tab warnings about known holes). Alerts are a repo
+setting on GitHub, and no file in the repo can turn them on. At hand-off,
+tell the user to turn them on after the first push, and print — never run —
+this command:
+
+```
+gh api -X PUT repos/<owner>/<repo>/vulnerability-alerts
+```
+
+`bin/security-scan` does **not** read Dependabot alerts, and must not be
+made to. It stays offline-capable and works before the repo has a GitHub
+remote. The two checks often agree, because they use similar advisory data,
+but they are separate: the scan gates `make ayce` and CI; alerts live on
+GitHub.
+
 ## § Devcontainer
 
 Write `.devcontainer/devcontainer.json` using the current Microsoft
@@ -474,7 +546,10 @@ decisions must exist before you write rationale about them.
    - `.okf/processes/quality-gate.md` — frontmatter `type: process`;
      describes what each `ayce` phase runs, what "green" means, that
      `make security-scan` exists standalone, and that `security.yaml` runs it
-     daily. Also describe `make betterleaks`: a secrets scan outside `ayce`
+     daily. Also say that Dependabot (`.github/dependabot.yml`) opens
+     weekly dependency-update PRs, that alerts are a separate GitHub repo
+     setting, and that `make security-scan` does not read those alerts.
+     Also describe `make betterleaks`: a secrets scan outside `ayce`
      and outside CI, that writes a dated, redacted report to
      `docs/betterleaks/`. Also describe `make open`: it opens the repo's
      `origin` page in the browser, and it stays outside `ayce` and CI.

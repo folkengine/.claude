@@ -90,6 +90,9 @@ roster. Never read more than one stack file per run.
    REPORT divergence with the actual diff; never silently rewrite — after
    the first commit these files belong to the user. Offer to apply the
    fresh output only if the user asks.
+   Also check `.github/dependabot.yml`: if it is missing, or its ecosystems
+   do not match baseline.md § Dependabot for this stack, report that and
+   offer to write it.
 7. **Verify** — `make ayce` to green, security-scan included. If an upgrade
    breaks the build, report the offender and offer to hold it back pinned so
    the rest lands.
@@ -104,6 +107,10 @@ roster. Never read more than one stack file per run.
 - One security-scan definition (`bin/security-scan`); Makefile and CI call it.
 - Every scaffold gets `make betterleaks` → `bin/secrets-scan` (baseline.md,
   § Makefile contract). It stays out of `ayce` and out of CI.
+- Every scaffold gets `.github/dependabot.yml` (baseline.md, § Dependabot)
+  for weekly dependency-update PRs. It does not turn on Dependabot alerts;
+  print the `gh api` command for that, never run it. `bin/security-scan`
+  never reads Dependabot alerts.
 - Every scaffold gets `make open` (baseline.md, § Makefile contract → The
   `open` target). It opens the repo's `origin` page in the browser. It stays
   out of `ayce` and out of CI.
