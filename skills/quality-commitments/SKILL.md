@@ -55,6 +55,7 @@ Ask:
 - Who are the key stakeholders (product, engineering, QA, customers, ops)?
 - Is this greenfield, legacy, or a significant feature addition?
 - Which stack template fits? *(REST API / Microservice — Node, Web App — React, Data Pipeline — Python, CLI — Rust, Mobile — React Native, Full-stack, or "scratch" to build from nothing)*
+- Do agents write code, docs, or PRs on this project? *(If yes, offer the **AI-assisted work add-on** alongside the stack template.)*
 
 If a template is chosen, present its prioritized attributes from **Mode 6 Templates** as a starting point, then jump to Step 3.
 
@@ -142,6 +143,8 @@ Work through every category. Record evidence (file paths) for what you find.
 **2j. Visual regression** — `percy/`, `chromatic`, `backstop.json`, `reg-cli`, Storybook test-runner.
 
 **2k. Type checking** — `tsconfig.json` strict, `mypy`/`pyright`, `tsc --noEmit` in CI, type coverage thresholds.
+
+**2l. AI-assisted work** — `CLAUDE.md`, `AGENTS.md`, `.claude/`, `.cursor/`, `.github/copilot-instructions.md`, agent `Co-Authored-By:` trailers in `git log`. If agents contribute, check the matrix, DoD, and PR template against the **AI-assisted work add-on**.
 
 ### Step 3 — Build the matrix from evidence
 
@@ -257,7 +260,7 @@ When a defect is discovered, use it as a learning catalyst. Ask the user to desc
 
 ### Step 2 — Pattern check
 - Is this a one-off or a pattern?
-- What process or tooling change would prevent recurrence?
+- What process or tooling change would prevent recurrence? If it is a pattern, `/twice` builds the guardrail: the most deterministic check that catches the class, proven to fail on the mistake.
 - Was an exploratory testing pass earlier in the cycle likely to have caught it? (If yes, the gap may be about *time* given to exploratory testing, not about the test types in the matrix.)
 
 ### Step 3 — Output
@@ -282,3 +285,11 @@ Use this mode to compare stacks before choosing, or to crib individual rows into
 Available stacks: **rest-api-node**, **web-react**, **data-pipeline-python**, **cli-rust**, **mobile-rn**, **fullstack**.
 
 Stacks are starting points — always customize for your context. If your project doesn't match a stack, build from the closest one or run **Mode 1 (Workshop)** from scratch.
+
+---
+
+## Add-on — AI-assisted work
+
+For projects where agents write code, docs, or PRs, a cross-cutting add-on layers three rows onto any stack's matrix: human review of outgoing changes scaled to stakes, optional AI-assistance disclosure in the PR body, and a guardrail on the second occurrence of a mistake. It lives at `addons/ai-assisted-work/notes.md` (relative to this skill's directory). Read it before offering.
+
+It is an add-on, not a stack, and it is **offered, never imposed**: ask once whether agents contribute to the project, present the rows, and let the team keep, change, or drop them. Its `notes.md` says how each mode uses it. The enforcement behind the rows lives in each developer's Claude configuration (`/slop-guard`, `/twice`), not in the scaffolded repo.
